@@ -24,6 +24,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY','4*#imhn)c@7k^e7r4)a(qw^f^+p&go8
 SPOT_SECRET_ID=os.environ.get('SPOT_SECRET_ID')
 SPOT_CLIENT_ID=os.environ.get('SPOT_CLIENT_ID')
 SPOT_CALLBACK=os.environ.get('SPOT_CALLBACK')
+PG_PASSWORD=os.environ.get('PG_PASSWORD')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -78,8 +79,12 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'ecomproject',
+        'USER': 'ecomprojectuser',
+        'PASSWORD': PG_PASSWORD,
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
