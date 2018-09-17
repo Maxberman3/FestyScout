@@ -2,7 +2,6 @@ from django.shortcuts import render,reverse,redirect
 from django.conf import settings
 import requests
 import json
-import base64
 from urllib.parse import urlencode
 
 spot_client_id=settings.SPOT_CLIENT_ID
