@@ -1,4 +1,4 @@
 Django==2.1.1
 psycopg2==2.7.5
-python-dotenv==0.9.1
-spotipy==2.4.4
+django-dotenv==1.4.2
+requests==2.19.1
