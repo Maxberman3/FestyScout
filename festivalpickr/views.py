@@ -2,7 +2,7 @@ from django.shortcuts import render,reverse,redirect
 from django.conf import settings
 import requests
 import json
-import base64
+import secrets
 from urllib.parse import urlencode
 
 spot_client_id=settings.SPOT_CLIENT_ID
@@ -14,14 +14,18 @@ def index(request):
 def getspotify(request):
     if "refresh_token" in request.session:
         return redirect(reverse('refreshlanding'))
+    state=secrets.token_urlsafe(20)
+    request.session['state_token']=state
     scope='user-library-read'
-    payload={'client_id':spot_client_id,'response_type':'code','redirect_uri':spot_uri,'scope':scope}
+    payload={'client_id':spot_client_id,'response_type':'code','redirect_uri':spot_uri,'scope':scope,'state':state}
     url_args=urlencode(payload)
     auth_url = "{}/?{}".format('https://accounts.spotify.com/authorize', url_args)
     return redirect(auth_url)
 def landing(request):
     if 'error' in request.GET:
         return render('festivalpickr/error.html',{'problem':'spotify authorization failed','message':'Either you failed to give permission to the app or there was a faulty connection'})
+    if request.GET['state'] != request.session['state_token']:
+        return render('festivalpickr/error.html',{'problem':'Are you trying to hack me?','message':'Get that weak shit outta here'})
     spotcode=request.GET['code']
     payload={
     'grant_type':'authorization_code',
