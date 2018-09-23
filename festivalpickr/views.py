@@ -1,10 +1,13 @@
 from django.shortcuts import render,reverse,redirect
+from django.contrib.auth import login,authenticate
+#from django.contrib.auth.forms import UserCreationForm
 from django.conf import settings
 import requests
 import json
 import secrets
 from urllib.parse import urlencode
 from django.core.mail import send_mail
+from .forms import SignUpForm
 
 spot_client_id=settings.SPOT_CLIENT_ID
 spot_secret_id=settings.SPOT_SECRET_ID
@@ -16,6 +19,19 @@ def whatisthis(request):
     return render(request,'festivalpickr/whatisthis.html')
 def contactus(request):
     return render(request,'festivalpickr/contactus.html')
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('index')
+    else:
+        form = SignUpForm()
+    return render(request, 'festivalpickr/signup.html', {'form': form})
 def toemail(request):
     if request.method != 'POST':
         return render('festivalpicr/error.html',{'problem':'unable to handle the message due to bad request','message':'This url should only be accessed through a post request'})
