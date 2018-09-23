@@ -5,58 +5,78 @@
 
 // Duration.
 	$duration: (
-		menu:				0.5s,
+		navPanel:			0.5s,
 		transition:			0.2s
 	);
 
 // Size.
 	$size: (
-		element-height:		3rem,
-		element-margin:		2rem,
-		padding:			2rem,
-		wrapper:			72rem
+		navPanel:			275px,
+		border-radius:		6px,
+		element-height:		3em,
+		element-margin:		2em,
+		container-width:	60em
 	);
 
 // Font.
 	$font: (
-		family:				('Merriweather', Georgia, serif),
-		family-heading:		('Source Sans Pro', Helvetica, sans-serif),
-		family-fixed:		('Courier New', monospace),
+		family:				('Source Sans Pro', sans-serif),
+		family-fixed:		monospace,
 		weight:				300,
-		weight-bold:		600,
-		weight-heading:		900
+		weight-bold:		400,
 	);
 
 // Palette.
 	$palette: (
-		wrapper-bg:			#212931,
+		bg:					#f5f5f5,
+		fg:					#777,
+		fg-bold:			#646464,
+		fg-light:			#999,
+		border:				#e5e5e5,
+		border-bg:			#f8f8f8,
+		border2:			#dddddd,
+		border2-bg:			#f0f0f0,
 
-		bg:					#ffffff,
-		fg:					#212931,
-		fg-bold:			#212931,
-		fg-light:			mix(#212931, #ffffff, 50%),
-		border:				mix(#dcdcdc, #ffffff, 50%),
-		border-bg:			rgba(#dcdcdc, 0.25),
-		accent:				#18bfef,
-
-		alt: (
-			bg:				#f5f5f5,
-			fg:				#717981,
-			fg-bold:		#717981,
-			fg-light:		mix(#717981, #f5f5f5, 50%),
-			border:			mix(#dcdcdc, #f5f5f5, 75%),
-			border-bg:		rgba(#dcdcdc, 0.5),
-			accent:			#18bfef,
+		header: (
+			bg:				#444,
+			fg:				#bbb,
+			fg-bold:		#fff,
+			fg-light:		#999
 		),
 
-		invert: (
-			bg:				#1e252d,
-			bg-alt:			#1e252d,
-			fg:				#ffffff,
+		accent1: (
+			bg:				#666,
+			fg:				mix(#666, #ffffff, 25%),
 			fg-bold:		#ffffff,
-			fg-light:		rgba(#ffffff, 0.5),
-			border:			#ffffff,
-			border-bg:		rgba(#ffffff,0.075),
-			accent:			#18bfef,
+			fg-light:		mix(#666, #ffffff, 40%)
 		),
+
+		accent2: (
+			bg:				#e89980,
+			fg:				mix(#e89980, #ffffff, 25%),
+			fg-bold:		#ffffff,
+			fg-light:		mix(#e89980, #ffffff, 40%)
+		),
+
+		accent3: (
+			bg:				#7fcdb8,
+			fg:				mix(#7fcdb8, #ffffff, 25%),
+			fg-bold:		#ffffff,
+			fg-light:		mix(#7fcdb8, #ffffff, 40%)
+		),
+
+		accent4: (
+			bg:				#90b0ba,
+			fg:				mix(#90b0ba, #ffffff, 25%),
+			fg-bold:		#ffffff,
+			fg-light:		mix(#90b0ba, #ffffff, 40%)
+		),
+
+		accent5: (
+			bg:				#e5cb95,
+			fg:				mix(#e5cb95, #ffffff, 25%),
+			fg-bold:		#ffffff,
+			fg-light:		mix(#e5cb95, #ffffff, 40%)
+		)
+
 	);
