@@ -1,6 +1,5 @@
 from django.shortcuts import render,reverse,redirect
 from django.contrib.auth import login,authenticate
-#from django.contrib.auth.forms import UserCreationForm
 from django.conf import settings
 import requests
 import json
@@ -12,13 +11,13 @@ from .forms import SignUpForm
 spot_client_id=settings.SPOT_CLIENT_ID
 spot_secret_id=settings.SPOT_SECRET_ID
 spot_uri=settings.SPOT_CALLBACK
-# Create your views here.
+# render homepage
 def index(request):
     return render(request,'festivalpickr/index.html')
-def whatisthis(request):
-    return render(request,'festivalpickr/whatisthis.html')
+# render contact us page
 def contactus(request):
     return render(request,'festivalpickr/contact.html')
+# render user sign up form and handle input
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -32,6 +31,7 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'festivalpickr/signup.html', {'form': form})
+# handles messages sent through contact us page
 def toemail(request):
     if request.method != 'POST':
         return render('festivalpicr/error.html',{'problem':'unable to handle the message due to bad request','message':'This url should only be accessed through a post request'})
@@ -46,7 +46,7 @@ def toemail(request):
     fail_silently=False,
     )
     return redirect('index')
-
+# gets user's artists from their spotify library
 def getspotify(request):
     if "refresh_token" in request.session:
         return redirect(reverse('refreshlanding'))
@@ -57,6 +57,7 @@ def getspotify(request):
     url_args=urlencode(payload)
     auth_url = "{}/?{}".format('https://accounts.spotify.com/authorize', url_args)
     return redirect(auth_url)
+# handles spotify callback after user authorization
 def landing(request):
     if 'error' in request.GET:
         return render('festivalpickr/error.html',{'problem':'spotify authorization failed','message':'Either you failed to give permission to the app or there was a faulty connection'})
@@ -94,6 +95,7 @@ def landing(request):
     'artists':artist_set
     }
     return render(request,'festivalpickr/festivals.html',context)
+# for users who have previously been authorized by spotify, they are rerouted immediately to landing page using their refresh token
 def refreshlanding(request):
     if 'refresh_token' not in request.session:
         return render('festivalpickr/error.html',{'problem':'you have not yet been authorized through spotify','message':'Im not even sure how you got here'})
