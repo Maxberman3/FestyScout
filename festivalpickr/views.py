@@ -18,7 +18,7 @@ def index(request):
 def whatisthis(request):
     return render(request,'festivalpickr/whatisthis.html')
 def contactus(request):
-    return render(request,'festivalpickr/contactus.html')
+    return render(request,'festivalpickr/contact.html')
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
