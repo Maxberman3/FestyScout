@@ -2,8 +2,9 @@ from django.shortcuts import render,reverse,redirect
 from django.conf import settings
 import requests
 import json
-import base64
+import secrets
 from urllib.parse import urlencode
+from django.core.mail import send_mail
 
 spot_client_id=settings.SPOT_CLIENT_ID
 spot_secret_id=settings.SPOT_SECRET_ID
@@ -11,17 +12,40 @@ spot_uri=settings.SPOT_CALLBACK
 # Create your views here.
 def index(request):
     return render(request,'festivalpickr/index.html')
+def whatisthis(request):
+    return render(request,'festivalpickr/whatisthis.html')
+def contactus(request):
+    return render(request,'festivalpickr/contactus.html')
+def toemail(request):
+    if request.method != 'POST':
+        return render('festivalpicr/error.html',{'problem':'unable to handle the message due to bad request','message':'This url should only be accessed through a post request'})
+    name=request.POST['name']
+    theirmail=request.POST['email']
+    contents=request.POST['message']
+    send_mail(
+    name,
+    contents,
+    theirmail,
+    ['festivalpickr@gmail.com'],
+    fail_silently=False,
+    )
+    return redirect('index')
+
 def getspotify(request):
     if "refresh_token" in request.session:
         return redirect(reverse('refreshlanding'))
+    state=secrets.token_urlsafe(20)
+    request.session['state_token']=state
     scope='user-library-read'
-    payload={'client_id':spot_client_id,'response_type':'code','redirect_uri':spot_uri,'scope':scope}
+    payload={'client_id':spot_client_id,'response_type':'code','redirect_uri':spot_uri,'scope':scope,'state':state}
     url_args=urlencode(payload)
     auth_url = "{}/?{}".format('https://accounts.spotify.com/authorize', url_args)
     return redirect(auth_url)
 def landing(request):
     if 'error' in request.GET:
         return render('festivalpickr/error.html',{'problem':'spotify authorization failed','message':'Either you failed to give permission to the app or there was a faulty connection'})
+    if request.GET['state'] != request.session['state_token']:
+        return render('festivalpickr/error.html',{'problem':'Are you trying to hack me?','message':'Get that weak shit outta here'})
     spotcode=request.GET['code']
     payload={
     'grant_type':'authorization_code',
