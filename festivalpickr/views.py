@@ -4,6 +4,7 @@ import requests
 import json
 import secrets
 from urllib.parse import urlencode
+from django.core.mail import send_mail
 
 spot_client_id=settings.SPOT_CLIENT_ID
 spot_secret_id=settings.SPOT_SECRET_ID
@@ -11,6 +12,25 @@ spot_uri=settings.SPOT_CALLBACK
 # Create your views here.
 def index(request):
     return render(request,'festivalpickr/index.html')
+def whatisthis(request):
+    return render(request,'festivalpickr/whatisthis.html')
+def contactus(request):
+    return render(request,'festivalpickr/contactus.html')
+def toemail(request):
+    if request.method != 'POST':
+        return render('festivalpicr/error.html',{'problem':'unable to handle the message due to bad request','message':'This url should only be accessed through a post request'})
+    name=request.POST['name']
+    theirmail=request.POST['email']
+    contents=request.POST['message']
+    send_mail(
+    name,
+    contents,
+    theirmail,
+    ['festivalpickr@gmail.com'],
+    fail_silently=False,
+    )
+    return redirect('index')
+
 def getspotify(request):
     if "refresh_token" in request.session:
         return redirect(reverse('refreshlanding'))
