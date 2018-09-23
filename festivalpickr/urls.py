@@ -12,5 +12,5 @@ path("refreshlanding",views.refreshlanding,name='refreshlanding'),
 path("contact",views.contact,name='contact'),
 path("toemail",views.toemail,name='toemail'),
 path("signup",views.signup,name='signup'),
-path('accounts/', include('django.contrib.auth.urls')),
+path('', include('django.contrib.auth.urls')),
 ]
