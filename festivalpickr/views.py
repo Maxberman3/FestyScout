@@ -15,7 +15,9 @@ spot_uri=settings.SPOT_CALLBACK
 def index(request):
     return render(request,'festivalpickr/index.html')
 # render contact us page
-def contactus(request):
+def about(request):
+    return render(request, 'festivalpickr/about.html')
+def contact(request):
     return render(request,'festivalpickr/contact.html')
 # render user sign up form and handle input
 def signup(request):
