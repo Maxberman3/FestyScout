@@ -10,4 +10,5 @@ path("refreshlanding",views.refreshlanding,name='refreshlanding'),
 path("whatisthis.html",views.whatisthis,name='whatisthis'),
 path("contactus.html",views.contactus,name='contactus'),
 path("toemail",views.toemail,name='toemail'),
+path("accounts/signup",views.signup,name='signup'),
 ]
