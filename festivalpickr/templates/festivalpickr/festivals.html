@@ -4,8 +4,9 @@
   <title>results</title>
 </head>
 <body>
-  {% for artist in artists %}
-  {{ artist }}
+  <ul>
+  {% for artist,id in artists.items %}
+  <li>{{ artist }} - {{id}} </li>
   {% endfor %}
 </body>
 </html>
