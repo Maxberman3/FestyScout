@@ -1,4 +1,4 @@
-import json, repquests
+import json, requests
 from django.conf import settings
 
 SONGKICK_KEY=settings.SONGKICK_KEY
