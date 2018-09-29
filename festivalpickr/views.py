@@ -51,6 +51,7 @@ def toemail(request):
     return redirect('index')
 # gets user's artists from their spotify library
 def getspotify(request):
+    print(spot_uri)
     if "refresh_token" in request.session:
         return redirect(reverse('refreshlanding'))
     state=secrets.token_urlsafe(20)
