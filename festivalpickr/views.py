@@ -51,7 +51,6 @@ def toemail(request):
     return redirect('index')
 # gets user's artists from their spotify library
 def getspotify(request):
-    print(spot_uri)
     if "refresh_token" in request.session:
         return redirect(reverse('refreshlanding'))
     state=secrets.token_urlsafe(20)
@@ -85,6 +84,9 @@ def landing(request):
     lib_request=requests.get(lib_request_url,headers=authorization_header)
     lib_data=json.loads(lib_request.text)
     artist_set=set()
+    if items not in lib_data:
+        print(lib_data)
+        return render('festivalpickr/error.html',{'problem':'Some sort of issue with the returned spotify library','message':'Check the console to see what was returned'})
     while True:
         for item in lib_data['items']:
             track=item['track']
@@ -96,7 +98,7 @@ def landing(request):
             lib_request=requests.get(lib_request_url,headers=authorization_header)
             lib_data=json.loads(lib_request.text)
     context={
-    'artists':songkickcall(artist_set),
+    'festivals':songkickcall(artist_set),
     }
     return render(request,'festivalpickr/festivals.html',context)
 # for users who have previously been authorized by spotify, they are rerouted immediately to landing page using their refresh token
@@ -124,6 +126,6 @@ def refreshlanding(request):
             lib_request=requests.get(lib_request_url,headers=authorization_header)
             lib_data=json.loads(lib_request.text)
     context={
-    'artists':songkickcall(artist_set)
+    'festivals':songkickcall(artist_set)
     }
     return render(request,'festivalpickr/festivals.html',context)
