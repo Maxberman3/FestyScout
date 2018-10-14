@@ -1,39 +1,74 @@
 <!-- pulls base template from base.html -->
 {% extends "festivalpickr/base.html" %}
 {% block content %}
-				<section id="parallax">
+<section id="parallax">
 
-						<!-- Banner -->
-						<section id="banner">
+		<!-- Banner -->
+		<section id="banner">
+			<header>
+				<h2>About Us</h2>
+			</header>
+		</section>
+
+		<!-- Main -->
+		<section id="main" class="container">
+			<div class="box">
+				<p style="font-size: 20px;">Hi! We are three UVA students (Maxwell Berman, Nick Sarris, Peter Ahn) in
+					CS4750 who want to provide a service that helps takes the work out of deciding
+					on attending musical events. Here is what we aim to do:</p>
+				<h3>Streamlining your decision.</h3>
+				<p style="font-size: 20px;">Deciding which music concert or festival to attend can be laborious. There is just no easy way to know how many of your favorite artists are going to be playing at massive events unless you count them yourself.</p>
+				<div class="row">
+					<div class="row-6 row-12-mobilep">
+						<h3>Utilizing up-to-date data on your favorite artists.</h3>
+						<p style="font-size: 20px;">Our service utilizes the Spotify Web API to retrieve data on artists and their upcoming concerts.</p>
+					</div>
+					<div class="row-6 row-12-mobilep">
+						<h3>We do the work for you.</h3>
+						<p style="font-size: 20px;">Using FestivalPickr is as simple as entering some of your favorite artists. FestivalPickr will produce easily digestible information to help you decide which concert is the best for you.</p>
+					</div>
+				</div>
+			</div>
+			<br />
+		</section>
+		<section id="main2" class="container">
+			<div>
+				<section class="box">
+					<div style="text-align: center;">
+						<div style="text-align: center;" class="row-6 row-12-mobilep">
 							<header>
-								<h2>About Us</h2>
+								<h3>Max Berman</h3>
+								<img src='https://image.ibb.co/dx6QPU/facebookphoto.jpg' alt="Max's face" style="width:300px;height:300px;">
+								<p style="font-size: 20px; margin: 10px 0px 0px 0px; padding: 0;">Max is a fourth-year Systems Engineer student who loves coding</p>
+								<p style="font-size: 20px; margin: 0; padding: 0;">and music. With FestivalPickr, he has combined two of his greatest passions</p>
+								<p style="font-size: 20px; margin: 0px 0px 35px 0px; padding: 0;">in a way that helps others discover their ideal festival experience.</p>
 							</header>
-						</section>
+						</div>
+						<div style="text-align: center;" class="row-6 row-12-mobilep">
+							<header>
+								<h3>Nick Sarris</h3>
+								<img src="https://image.ibb.co/drMjJ0/21435848-236582203533728-8295431733940060160-n.jpg" alt="Nick's face" style="width:300px;height:300px;">
+								<p style="font-size: 20px; margin: 10px 0px 0px 0px; padding: 0;">Nick is a third-year Computer Science student who has a keen sense of</p>
+								<p style="font-size: 20px; margin: 0; padding: 0;">entrepreneurship when it comes to coding. Nick has strong interests in machine</p>
+								<p style="font-size: 20px; margin: 0; padding: 0;">learning and cryptocurrencies, especially the latter as he's coded and is actively</p>
+								<p style="font-size: 20px; margin: 0px 0px 35px 0px; padding: 0;">working on two of his own.</p>
+							</header>
+						</div>
+						<div style="text-align: center;" class="row-6 row-12-mobilep">
+							<header>
+								<h3>Peter Ahn</h3>
+								<img src='https://image.ibb.co/e7oddp/11800320-151334895198109-3310367875303978558-n.jpg' alt="Peter's face" style="width:200px;height:180px;">
+								<p style="font-size: 20px; margin: 10px 0px 0px 0px; padding: 0;">Peter is a fourth-year Cognitive Science student with a concentration</p>
+								<p style="font-size: 20px; margin: 0; padding: 0;">in Computer Science. His favorite hobbies are running, video gaming, and</p>
+								<p style="font-size: 20px; margin: 0; padding: 0;">spending time with friends. He plans on joining the Marine Corps after graduating</p>
+								<p style="font-size: 20px; margin: 0; padding: 0;">college.</p>
+							</header>
+						</div>
+					</div>
+				</section>
+			</div>
+			<br />
+		</section>
 
-						<!-- Main -->
-							<section id="main" class="container">
-								<div class="box">
-									<p>Hi! We are three UVA students (Maxwell Berman, Nick Sarris, Peter Ahn) in
-										CS4750 who want to provide a service that helps takes the work out of deciding
-										on attending musical events. Here is what we aim to do:</p>
-
-								<h3>Streamlining your decision.</h3>
-								<p>Deciding which music concert or festival to attend can be laborious. There is just no easy way to know how many of your favorite artists are going to be playing at massive events unless you count them yourself.</p>
-								<div class="row">
-									<div class="row-6 row-12-mobilep">
-										<h3>Utilizing up-to-date data on your favorite artists.</h3>
-										<p>Our service utilizes the Spotify Web API to retrieve data on artists and their upcoming concerts.</p>
-									</div>
-									<div class="row-6 row-12-mobilep">
-										<h3>We do the work for you.</h3>
-										<p>Using FestivalPickr is as simple as entering some of your favorite artists. FestivalPickr will produce easily digestible information to help you decide which concert is the best for you.</p>
-									</div>
-								</div>
-							</div>
-
-							<br />
-
-					</section>
-
-		</div>
+</section>
 {% endblock content %}

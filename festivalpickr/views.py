@@ -20,12 +20,20 @@ def about(request):
     return render(request, 'festivalpickr/about.html')
 def contact(request):
     return render(request,'festivalpickr/contact.html')
+def login(request):
+    return render(request,'registration/login.html')
 # render user sign up form and handle input
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save();
+            user.refresh_from_db()
+            user.profile.address = form.cleaned_data.get('address')
+            user.profile.city = form.cleaned_data.get('city')
+            user.profile.state = form.cleaned_data.get('state')
+            user.profile.zip = form.cleaned_data.get('zip')
+            user.save()
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
