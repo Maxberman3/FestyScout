@@ -7,6 +7,7 @@ import secrets
 from urllib.parse import urlencode
 from django.core.mail import send_mail
 from .forms import SignUpForm
+from festivalpickr.utils import songkickcall
 
 spot_client_id=settings.SPOT_CLIENT_ID
 spot_secret_id=settings.SPOT_SECRET_ID
@@ -83,6 +84,9 @@ def landing(request):
     lib_request=requests.get(lib_request_url,headers=authorization_header)
     lib_data=json.loads(lib_request.text)
     artist_set=set()
+    if items not in lib_data:
+        print(lib_data)
+        return render('festivalpickr/error.html',{'problem':'Some sort of issue with the returned spotify library','message':'Check the console to see what was returned'})
     while True:
         for item in lib_data['items']:
             track=item['track']
@@ -94,7 +98,7 @@ def landing(request):
             lib_request=requests.get(lib_request_url,headers=authorization_header)
             lib_data=json.loads(lib_request.text)
     context={
-    'artists':artist_set
+    'festivals':songkickcall(artist_set),
     }
     return render(request,'festivalpickr/festivals.html',context)
 # for users who have previously been authorized by spotify, they are rerouted immediately to landing page using their refresh token
@@ -122,6 +126,6 @@ def refreshlanding(request):
             lib_request=requests.get(lib_request_url,headers=authorization_header)
             lib_data=json.loads(lib_request.text)
     context={
-    'artists':artist_set
+    'festivals':songkickcall(artist_set)
     }
     return render(request,'festivalpickr/festivals.html',context)

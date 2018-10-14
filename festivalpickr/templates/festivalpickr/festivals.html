@@ -4,8 +4,9 @@
   <title>results</title>
 </head>
 <body>
-  {% for artist in artists %}
-  {{ artist }}
+  <ul>
+  {% for name,scores in festivals.items %}
+  <li><h6>{{ name }}</h6> </br> Score: {{scores.score}} Bands: {% for band in scores.bands %} {{band}},{% endfor %}</li>
   {% endfor %}
 </body>
 </html>
