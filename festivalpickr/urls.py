@@ -1,6 +1,5 @@
-from django.urls import path, include
+from django.urls import path
 from . import views
-from django.contrib.auth import views as auth_views
 
 urlpatterns=[
 path("",views.index,name='index'),
@@ -11,6 +10,5 @@ path("landing/",views.landing,name='landing'),
 path("refreshlanding",views.refreshlanding,name='refreshlanding'),
 path("contact",views.contact,name='contact'),
 path("toemail",views.toemail,name='toemail'),
-path("signup",views.signup,name='signup'),
-path('', include('django.contrib.auth.urls')),
+path("accounts/signup",views.signup,name='signup'),
 ]
