@@ -1,5 +1,6 @@
 from django.shortcuts import render,reverse,redirect
-from django.contrib.auth import login,authenticate
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as django_login
 from django.conf import settings
 import requests
 import json
@@ -37,7 +38,7 @@ def signup(request):
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
-            login(request, user)
+            django_login(request, user)
             return redirect('index')
     else:
         form = SignUpForm()
