@@ -93,7 +93,7 @@ def landing(request):
     lib_request=requests.get(lib_request_url,headers=authorization_header)
     lib_data=json.loads(lib_request.text)
     artist_set=set()
-    if items not in lib_data:
+    if 'items' not in lib_data:
         print(lib_data)
         return render('festivalpickr/error.html',{'problem':'Some sort of issue with the returned spotify library','message':'Check the console to see what was returned'})
     while True:
