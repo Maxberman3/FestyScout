@@ -25,6 +25,7 @@ SPOT_SECRET_ID=os.environ.get('SPOT_SECRET_ID')
 SPOT_CLIENT_ID=os.environ.get('SPOT_CLIENT_ID')
 SPOT_CALLBACK=os.environ.get('SPOT_CALLBACK')
 PG_PASSWORD=os.environ.get('PG_PASSWORD')
+SONGKICK_KEY=os.environ.get('SONGKICK_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'festivalpickr.apps.FestivalpickrConfig',
+    'localflavor',
 ]
 
 MIDDLEWARE = [

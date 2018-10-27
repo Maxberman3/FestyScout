@@ -1,5 +1,6 @@
 from django.shortcuts import render,reverse,redirect
-from django.contrib.auth import login,authenticate
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as django_login
 from django.conf import settings
 import requests
 import json
@@ -7,6 +8,7 @@ import secrets
 from urllib.parse import urlencode
 from django.core.mail import send_mail
 from .forms import SignUpForm
+from festivalpickr.utils import songkickcall
 
 spot_client_id=settings.SPOT_CLIENT_ID
 spot_secret_id=settings.SPOT_SECRET_ID
@@ -19,16 +21,24 @@ def about(request):
     return render(request, 'festivalpickr/about.html')
 def contact(request):
     return render(request,'festivalpickr/contact.html')
+def login(request):
+    return render(request,'registration/login.html')
 # render user sign up form and handle input
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save();
+            user.refresh_from_db()
+            user.profile.address = form.cleaned_data.get('address')
+            user.profile.city = form.cleaned_data.get('city')
+            user.profile.state = form.cleaned_data.get('state')
+            user.profile.zip = form.cleaned_data.get('zip')
+            user.save()
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
-            login(request, user)
+            django_login(request, user)
             return redirect('index')
     else:
         form = SignUpForm()
@@ -83,6 +93,9 @@ def landing(request):
     lib_request=requests.get(lib_request_url,headers=authorization_header)
     lib_data=json.loads(lib_request.text)
     artist_set=set()
+    if items not in lib_data:
+        print(lib_data)
+        return render('festivalpickr/error.html',{'problem':'Some sort of issue with the returned spotify library','message':'Check the console to see what was returned'})
     while True:
         for item in lib_data['items']:
             track=item['track']
@@ -94,7 +107,7 @@ def landing(request):
             lib_request=requests.get(lib_request_url,headers=authorization_header)
             lib_data=json.loads(lib_request.text)
     context={
-    'artists':artist_set
+    'festivals':songkickcall(artist_set),
     }
     return render(request,'festivalpickr/festivals.html',context)
 # for users who have previously been authorized by spotify, they are rerouted immediately to landing page using their refresh token
@@ -122,7 +135,7 @@ def refreshlanding(request):
             lib_request=requests.get(lib_request_url,headers=authorization_header)
             lib_data=json.loads(lib_request.text)
     context={
-    'artists':artist_set
+    'festivals':songkickcall(artist_set)
     }
     return render(request,'festivalpickr/festivals.html',context)
 

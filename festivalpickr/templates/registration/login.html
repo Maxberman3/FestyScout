@@ -1,14 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title> Login </title>
-</head>
-<body>
-<h2>Login</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Login</button>
-</form>
-</body>
-</html>
+{% extends 'festivalpickr/base.html' %}
+
+{% block content %}
+<section id="parallax">
+
+    <!-- Banner -->
+    <section id="banner">
+      <header>
+        <h2>Login</h2>
+      </header>
+    </section>
+
+    <!-- Main -->
+    <section id="main" class="container medium">
+      <div class="box">
+        <form method="post">
+          {% csrf_token %}
+          {% for field in form %}
+            <p>
+              <b style="font-size: 24px;">{{ field.label_tag | title }}</b>
+              {{ field }}
+              {% if field.help_text %}
+                <small style="color: black">{{ field.help_text }}</small>
+              {% endif %}
+              {% for error in field.errors %}
+                <br><b style="color: red">{{ error }}</b>
+              {% endfor %}
+            </p>
+          {% endfor %}
+          <button type="submit">Login</button>
+        </form>
+      </div>
+    </section>
+
+    <br />
+
+</section>
+{% endblock %}
