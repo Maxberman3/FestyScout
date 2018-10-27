@@ -15,6 +15,7 @@ def ourdbcall(artist_iterable):
                 else:
                     festivals[festival.name]['score']+=1
                     festivals[festival.name]['bands'].append(artist)
+    return festivals;
 
 def has_name_chars(form_data):
     for character in form_data:
