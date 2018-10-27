@@ -1,29 +1,40 @@
+import requests
+import json
+import secrets
+
+from django import forms
+from decimal import Decimal
 from django.shortcuts import render,reverse,redirect
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
 from django.conf import settings
-import requests
-import json
-import secrets
+
 from urllib.parse import urlencode
 from django.core.mail import send_mail
-from .forms import SignUpForm
+from .forms import SignUpForm, PaymentForm
 from festivalpickr.utils import songkickcall
+
+from django_coinpayments.models import Payment
+from django_coinpayments.exceptions import CoinPaymentsProviderError
+from django.views.generic import FormView, ListView, DetailView
+from django.shortcuts import render, get_object_or_404
 
 spot_client_id=settings.SPOT_CLIENT_ID
 spot_secret_id=settings.SPOT_SECRET_ID
 spot_uri=settings.SPOT_CALLBACK
-# render homepage
+
 def index(request):
     return render(request,'festivalpickr/index.html')
-# render contact us page
+
 def about(request):
     return render(request, 'festivalpickr/about.html')
+
 def contact(request):
     return render(request,'festivalpickr/contact.html')
+
 def login(request):
     return render(request,'registration/login.html')
-# render user sign up form and handle input
+
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -43,7 +54,7 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'festivalpickr/signup.html', {'form': form})
-# handles messages sent through contact us page
+
 def toemail(request):
     if request.method != 'POST':
         return render('festivalpicr/error.html',{'problem':'unable to handle the message due to bad request','message':'This url should only be accessed through a post request'})
@@ -58,7 +69,7 @@ def toemail(request):
     fail_silently=False,
     )
     return redirect('index')
-# gets user's artists from their spotify library
+
 def getspotify(request):
     if "refresh_token" in request.session:
         return redirect(reverse('refreshlanding'))
@@ -69,7 +80,7 @@ def getspotify(request):
     url_args=urlencode(payload)
     auth_url = "{}/?{}".format('https://accounts.spotify.com/authorize', url_args)
     return redirect(auth_url)
-# handles spotify callback after user authorization
+
 def landing(request):
     if 'error' in request.GET:
         return render('festivalpickr/error.html',{'problem':'spotify authorization failed','message':'Either you failed to give permission to the app or there was a faulty connection'})
@@ -110,7 +121,7 @@ def landing(request):
     'festivals':songkickcall(artist_set),
     }
     return render(request,'festivalpickr/festivals.html',context)
-# for users who have previously been authorized by spotify, they are rerouted immediately to landing page using their refresh token
+
 def refreshlanding(request):
     if 'refresh_token' not in request.session:
         return render('festivalpickr/error.html',{'problem':'you have not yet been authorized through spotify','message':'Im not even sure how you got here'})
@@ -134,7 +145,50 @@ def refreshlanding(request):
             lib_request_url=lib_data['next']
             lib_request=requests.get(lib_request_url,headers=authorization_header)
             lib_data=json.loads(lib_request.text)
+    festivals=songkickcall(artist_set)
+    festivals_order=sorted(festivals,key=lambda k:festivals[k]['score'],reverse=True)
     context={
-    'festivals':songkickcall(artist_set)
+    'festivals':festivals,
+    'festivals_order':festivals_order,
     }
     return render(request,'festivalpickr/festivals.html',context)
+
+def create_tx(request, payment):
+    context = {}
+    try:
+        tx = payment.create_tx()
+        payment.status = Payment.PAYMENT_STATUS_PENDING
+        payment.save()
+        context['object'] = payment
+    except CoinPaymentsProviderError as e:
+        context['error'] = e
+    return render(request, 'festivalpickr/payment_result.html', context)
+
+class PaymentDetail(DetailView):
+    model = Payment
+    template_name = 'festivalpickr/payment_result.html'
+    context_object_name = 'object'
+
+class PaymentSetupView(FormView):
+    template_name = 'festivalpickr/payment_setup.html'
+    form_class = PaymentForm
+
+    def form_valid(self, form):
+        cl = form.cleaned_data
+        payment = Payment(currency_original=cl['currency_paid'],
+                          currency_paid=cl['currency_paid'],
+                          amount=Decimal(0.05),
+                          amount_paid=Decimal(0),
+                          status=Payment.PAYMENT_STATUS_PROVIDER_PENDING)
+        return create_tx(self.request, payment)
+
+def create_new_payment(request, pk):
+    payment = get_object_or_404(Payment, pk=pk)
+    if payment.status in [Payment.PAYMENT_STATUS_PROVIDER_PENDING, Payment.PAYMENT_STATUS_TIMEOUT]:
+        pass
+    elif payment.status in [Payment.PAYMENT_STATUS_PENDING]:
+        payment.provider_tx.delete()
+    else:
+        error = "Invalid status - {}".format(payment.get_status_display())
+        return render(request, 'festivalpickrs/payment_result.html', {'error': error})
+    return create_tx(request, payment)
