@@ -125,3 +125,6 @@ def refreshlanding(request):
     'artists':artist_set
     }
     return render(request,'festivalpickr/festivals.html',context)
+
+def searchresults(request):
+    return render(request,'festivalpickr/searchresults.html')

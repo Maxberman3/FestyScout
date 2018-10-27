@@ -1,0 +1,32 @@
+<!-- pulls base template from base.html -->
+{% extends "festivalpickr/base.html" %}
+{% block content %}
+
+<section id="parallax">
+
+<!-- Banner -->
+  <section id="banner">
+    <header>
+      <h2>Results</h2>
+    </header>
+  </section>
+
+<!-- Main -->
+  <section id="main" class="container">
+    {% for result in festival_order.festival_name %}
+      <div class="box">
+        <h2> Name: {% festival_order[festival_name] %}</h2>
+        <h2> Band list:</h2>
+          {% for band in range(len(festival_order[festival_name][bands])):
+                print(festival_order[festival_name][bands][band])
+          %}
+        <h2> Score: {% festival_order[festival_name][score] %}</h2>
+        <a href="#" class="btn btn-default" role="button">Purchase a ticket</a>
+    {% endfor %}
+      </div>
+    <br />
+  </section>
+
+  </section>
+
+{% endblock %}

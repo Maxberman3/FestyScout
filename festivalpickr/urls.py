@@ -11,4 +11,5 @@ path("refreshlanding",views.refreshlanding,name='refreshlanding'),
 path("contact",views.contact,name='contact'),
 path("toemail",views.toemail,name='toemail'),
 path("accounts/signup",views.signup,name='signup'),
+path("searchresults",views.searchresults,name='searchresults')
 ]
