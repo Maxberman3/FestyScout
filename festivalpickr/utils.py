@@ -7,7 +7,7 @@ SONGKICK_KEY=settings.SONGKICK_KEY
 def has_name_chars(form_data):
     for character in form_data:
         if character in "!@#$%^&*()~,./?;:1234567890}{<>-+=":
-            print('{field} contains {character}')
+            #print('{field} contains {character}')
             raise forms.ValidationError('You included a number or special character in a name or city field')
 def songkickcall(artist_iterable):
     festivals={}

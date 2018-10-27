@@ -134,7 +134,10 @@ def refreshlanding(request):
             lib_request_url=lib_data['next']
             lib_request=requests.get(lib_request_url,headers=authorization_header)
             lib_data=json.loads(lib_request.text)
+    festivals=songkickcall(artist_set)
+    festivals_order=sorted(festivals,key=lambda k:festivals[k]['score'],reverse=True)
     context={
-    'festivals':songkickcall(artist_set)
+    'festivals':festivals,
+    'festivals_order':festivals_order,
     }
     return render(request,'festivalpickr/festivals.html',context)
