@@ -1,0 +1,50 @@
+{% extends 'festivalpickr/base.html' %}
+
+{% block content %}
+<section id="parallax">
+
+    <!-- Banner -->
+    <section id="banner">
+      <header>
+        <h2>Payment</h2>
+      </header>
+    </section>
+
+    <!-- Main -->
+      <section id="main" class="container medium">
+        <div class="box">
+          {% if error %}
+            <div class="alert alert-danger" role="alert">
+              An error occured: {{ error }}
+            </div>
+          {% else %}
+            <div style="text-align: center;">
+              <div style="font-size: 28px;">
+                Connection Established
+              </div>
+              <img src="{{ object.provider_tx.qrcode_url }}">
+              <div style="font-size: 20px;">
+                Send {{ object.provider_tx.amount.normalize }}
+                {{ object.get_currency_paid_display }}
+                to
+              </div>
+              <div style="font-size: 20px;">
+                {{ object.provider_tx.address }}
+              </div>
+              <br>
+              <a style="font-size: 16px;" class="button" href="{{ object.provider_tx.status_url }}" target="_blank">
+                <span>
+                  View Status
+                </span>
+              </a>
+            </div>
+          {% endif %}
+
+        </form>
+      </div>
+    </section>
+
+    <br />
+
+</section>
+{% endblock %}
