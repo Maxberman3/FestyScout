@@ -130,12 +130,15 @@ def landing(request):
     elif request.session['type']=='songkick':
         festivals=songkickcall(artist_set)
     festivals_order=sorted(festivals,key=lambda k:festivals[k]['score'],reverse=True)
+    sorted_dicts=[]
+    for festival in festivals_order:
+        sorted_dicts.append(festivals[festival])
+    combo_list=zip(festivals_order,sorted_dicts)
     context={
-    'festivals':festivals,
-    'festivals_order':festivals_order
+    'festivals':combo_list,
     }
-    return render(request,'festivalpickr/festivals.html',context)
-
+    return render(request,'festivalpickr/searchresults.html',context)
+# for users who have previously been authorized by spotify, they are rerouted immediately to landing page using their refresh token
 def refreshlanding(request):
     if 'refresh_token' not in request.session:
         return render('festivalpickr/error.html',{'problem':'you have not yet been authorized through spotify','message':'Im not even sure how you got here'})
@@ -164,11 +167,14 @@ def refreshlanding(request):
     elif request.session['type']=='songkick':
         festivals=songkickcall(artist_set)
     festivals_order=sorted(festivals,key=lambda k:festivals[k]['score'],reverse=True)
+    sorted_dicts=[]
+    for festival in festivals_order:
+        sorted_dicts.append(festivals[festival])
+    combo_list=zip(festivals_order,sorted_dicts)
     context={
-    'festivals':festivals,
-    'festivals_order':festivals_order,
+    'festivals':combo_list,
     }
-    return render(request,'festivalpickr/festivals.html',context)
+    return render(request,'festivalpickr/searchresults.html',context)
 
 def create_tx(request, payment):
     context = {}

@@ -13,20 +13,22 @@
 
 <!-- Main -->
   <section id="main" class="container">
-    {% for result in festival_order.festival_name %}
+    <ul>
+    {% for festivalname,info in festivals %}
+    <li>
       <div class="box">
-        <h2> Name: {% festival_order[festival_name] %}</h2>
-        <h2> Band list:</h2>
-          {% for band in range(len(festival_order[festival_name][bands])):
-                print(festival_order[festival_name][bands][band])
-          %}
-        <h2> Score: {% festival_order[festival_name][score] %}</h2>
+        <h3> Name: {{festivalname}}</h3>
+        <h4> Band list:</h4>
+                <i>{{info.bands}},</i>
+        <h3> Score: {{info.score}}</h3>
         <a href="#" class="btn btn-default" role="button">Purchase a ticket</a>
+        </div>
+        </li>
     {% endfor %}
-      </div>
+    </ul>
     <br />
   </section>
 
   </section>
 
-{% endblock %}
+{% endblock content %}
