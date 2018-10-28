@@ -8,7 +8,7 @@ import secrets
 from urllib.parse import urlencode
 from django.core.mail import send_mail
 from .forms import SignUpForm
-from festivalpickr.utils import songkickcall
+from festivalpickr.utils import songkickcall,ourdbcall
 
 spot_client_id=settings.SPOT_CLIENT_ID
 spot_secret_id=settings.SPOT_SECRET_ID
@@ -60,6 +60,14 @@ def toemail(request):
     return redirect('index')
 # gets user's artists from their spotify library
 def getspotify(request):
+    if request.method != 'POST':
+        return render('festivalpicr/error.html',{'problem':'unable to handle due to bad request','message':'This url should only be accessed through a post request'})
+    if "songkick" in request.POST:
+        request.session['type']='songkick'
+    elif "our_db" in request.POST:
+        request.session['type']='our_db'
+    else:
+        return render('festivalpicr/error.html',{'problem':'unable to handle due to bad request','message':'post request contained incorrect information'})
     if "refresh_token" in request.session:
         return redirect(reverse('refreshlanding'))
     state=secrets.token_urlsafe(20)
@@ -106,8 +114,14 @@ def landing(request):
             lib_request_url=lib_data['next']
             lib_request=requests.get(lib_request_url,headers=authorization_header)
             lib_data=json.loads(lib_request.text)
+    if request.session['type']=='our_db':
+        festivals=ourdbcall(artist_set)
+    elif request.session['type']=='songkick':
+        festivals=songkickcall(artist_set)
+    festivals_order=sorted(festivals,key=lambda k:festivals[k]['score'],reverse=True)
     context={
-    'festivals':songkickcall(artist_set),
+    'festivals':festivals,
+    'festivals_order':festivals_order
     }
     return render(request,'festivalpickr/festivals.html',context)
 # for users who have previously been authorized by spotify, they are rerouted immediately to landing page using their refresh token
@@ -134,7 +148,10 @@ def refreshlanding(request):
             lib_request_url=lib_data['next']
             lib_request=requests.get(lib_request_url,headers=authorization_header)
             lib_data=json.loads(lib_request.text)
-    festivals=songkickcall(artist_set)
+    if request.session['type']=='our_db':
+        festivals=ourdbcall(artist_set)
+    elif request.session['type']=='songkick':
+        festivals=songkickcall(artist_set)
     festivals_order=sorted(festivals,key=lambda k:festivals[k]['score'],reverse=True)
     context={
     'festivals':festivals,
