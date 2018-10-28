@@ -8,11 +8,11 @@ from django.shortcuts import render,reverse,redirect
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
 from django.conf import settings
-
 from urllib.parse import urlencode
 from django.core.mail import send_mail
+from festivalpickr.utils import songkickcall,ourdbcall
 from .forms import SignUpForm, PaymentForm
-from festivalpickr.utils import songkickcall
+
 
 from django_coinpayments.models import Payment
 from django_coinpayments.exceptions import CoinPaymentsProviderError
@@ -71,6 +71,14 @@ def toemail(request):
     return redirect('index')
 
 def getspotify(request):
+    if request.method != 'POST':
+        return render('festivalpicr/error.html',{'problem':'unable to handle due to bad request','message':'This url should only be accessed through a post request'})
+    if "songkick" in request.POST:
+        request.session['type']='songkick'
+    elif "our_db" in request.POST:
+        request.session['type']='our_db'
+    else:
+        return render('festivalpicr/error.html',{'problem':'unable to handle due to bad request','message':'post request contained incorrect information'})
     if "refresh_token" in request.session:
         return redirect(reverse('refreshlanding'))
     state=secrets.token_urlsafe(20)
@@ -104,7 +112,7 @@ def landing(request):
     lib_request=requests.get(lib_request_url,headers=authorization_header)
     lib_data=json.loads(lib_request.text)
     artist_set=set()
-    if items not in lib_data:
+    if 'items' not in lib_data:
         print(lib_data)
         return render('festivalpickr/error.html',{'problem':'Some sort of issue with the returned spotify library','message':'Check the console to see what was returned'})
     while True:
@@ -117,8 +125,14 @@ def landing(request):
             lib_request_url=lib_data['next']
             lib_request=requests.get(lib_request_url,headers=authorization_header)
             lib_data=json.loads(lib_request.text)
+    if request.session['type']=='our_db':
+        festivals=ourdbcall(artist_set)
+    elif request.session['type']=='songkick':
+        festivals=songkickcall(artist_set)
+    festivals_order=sorted(festivals,key=lambda k:festivals[k]['score'],reverse=True)
     context={
-    'festivals':songkickcall(artist_set),
+    'festivals':festivals,
+    'festivals_order':festivals_order
     }
     return render(request,'festivalpickr/festivals.html',context)
 
@@ -145,7 +159,10 @@ def refreshlanding(request):
             lib_request_url=lib_data['next']
             lib_request=requests.get(lib_request_url,headers=authorization_header)
             lib_data=json.loads(lib_request.text)
-    festivals=songkickcall(artist_set)
+    if request.session['type']=='our_db':
+        festivals=ourdbcall(artist_set)
+    elif request.session['type']=='songkick':
+        festivals=songkickcall(artist_set)
     festivals_order=sorted(festivals,key=lambda k:festivals[k]['score'],reverse=True)
     context={
     'festivals':festivals,
