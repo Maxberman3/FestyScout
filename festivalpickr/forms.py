@@ -1,9 +1,11 @@
-from django import forms
-from django.contrib.auth.forms import UserCreationForm
 from .models import User
+from django import forms
 from localflavor.us.forms import USZipCodeField, USStateSelect, USStateField
 from festivalpickr.utils import has_name_chars
 
+from django.forms import ModelForm
+from django_coinpayments.models import Payment
+from django.contrib.auth.forms import UserCreationForm
 
 class SignUpForm(UserCreationForm):
 
@@ -36,3 +38,9 @@ class SignUpForm(UserCreationForm):
         city=self.cleaned_data['city']
         has_name_chars(city)
         return city
+
+class PaymentForm(ModelForm):
+
+    class Meta:
+        model = Payment
+        fields = ['currency_paid']

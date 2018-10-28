@@ -5,27 +5,29 @@
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 -->
 <html>
-	<head>
-		<title>FestivalPickr</title>
-		<meta charset="utf-8" />
-		{% load static %}
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="{% static "festivalpickr/assets/css/main.css" %}"/>
-	</head>
-	<body class="landing is-preload">
+
+<head>
+	<title>FestivalPickr</title>
+	<meta charset="utf-8" />
+	{% load static %}
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="{% static "festivalpickr/assets/css/main.css" %}"/>
+</head>
+
+<body class="landing is-preload">
 		<div id="page-wrapper">
 
 			<!-- Header -->
 				<header id="header" class="alt">
-					<h1><a href="index">FestivalPickr</a></h1>
+					<h1><a href="{% url 'index' %}">FestivalPickr</a></h1>
 					<nav id="nav">
 						<ul>
-							<li><a href="index">Home</a></li>
+							<li><a href="{% url 'index' %}">Home</a></li>
 							<li>
 								<a href="#" class="icon fa-angle-down">More</a>
 								<ul>
-									<li><a href="about">About Us</a></li>
-									<li><a href="contact">Contact Us</a></li>
+									<li><a href="{% url 'about' %}">About Us</a></li>
+									<li><a href="{% url 'contact' %}">Contact Us</a></li>
 								</ul>
 							</li>
 							<li><a href="{% url 'signup' %}" class="button">Sign Up</a></li>
@@ -33,8 +35,6 @@
 						</ul>
 					</nav>
 				</header>
-
-				<section id="parallax">
 
 <!-- inserts the content from another template -->
 {% block content %}{% endblock %}
@@ -47,6 +47,6 @@
 			<script src="{% static "festivalpickr/assets/js/breakpoints.min.js" %}"></script>
 			<script src="{% static "festivalpickr/assets/js/util.js" %}"></script>
 			<script src="{% static "festivalpickr/assets/js/main.js" %}"></script>
-	</body>
 
+</body>
 </html>

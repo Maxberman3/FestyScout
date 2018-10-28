@@ -6,14 +6,14 @@
     <!-- Banner -->
     <section id="banner">
       <header>
-        <h2>Login</h2>
+        <h2>Payment</h2>
       </header>
     </section>
 
     <!-- Main -->
       <section id="main" class="container medium">
         <div class="box">
-          <form method="post">
+          <form action="" method="post">
             {% csrf_token %}
             {% for field in form %}
               <p>
