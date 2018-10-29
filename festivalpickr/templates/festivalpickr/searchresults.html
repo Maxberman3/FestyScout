@@ -22,8 +22,8 @@
                 <i>{{info.bands}},</i>
         <h3> Score: {{info.score}}</h3>
         <form method="post" action="{% url 'payment' %}">
-          {{% csrf_token %}}
-        <button class="btn btn-default" value="{{ festivalname }}" name="festivalname">Purchase a ticket</button>
+          {% csrf_token %}
+          <button class="btn btn-default" value="{{ festivalname }}" name="festivalname">Purchase a ticket</button>
         </form>
         </div>
         </li>

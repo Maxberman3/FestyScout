@@ -8,12 +8,12 @@ from django.shortcuts import render,reverse,redirect
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
 from django.conf import settings
+from django.http import HttpResponse
 from urllib.parse import urlencode
 from festivalpickr.utils import songkickcall,ourdbcall
 from .forms import SignUpForm, PaymentForm
-from .models import Profile
+from .models import Profile, Festival
 from festivalpickr.utils import songkickcall
-
 from django_coinpayments.models import Payment
 from django_coinpayments.exceptions import CoinPaymentsProviderError
 from django.views.generic import FormView, ListView, DetailView
@@ -189,8 +189,6 @@ def refreshlanding(request):
 
 def create_tx(request, payment, email):
     context = {}
-    name_of_festival=request.POST['festivalname']
-    price=Festival.objects.get(name=name_of_festival).price
     try:
         tx = payment.create_tx(buyer_email = email)
         payment.status = Payment.PAYMENT_STATUS_PENDING
@@ -208,12 +206,22 @@ class PaymentDetail(DetailView):
 class PaymentSetupView(FormView):
     template_name = 'festivalpickr/payment.html'
     form_class = PaymentForm
+    festival_dict = {}
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.festival_dict['festival'] = self.request.POST['festivalname']
+            return super(PaymentSetupView, self).dispatch(request, *args, **kwargs)
+        except:
+            return super(PaymentSetupView, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         cl = form.cleaned_data
-        payment = Payment(currency_original=cl['currency_paid'],
+        festival = self.festival_dict['festival']
+        price = Festival.objects.get(name=festival).price
+        payment = Payment(currency_original='USD',
                           currency_paid=cl['currency_paid'],
-                          amount=Decimal(0.0001),
+                          amount=Decimal(price),
                           amount_paid=Decimal(0),
                           status=Payment.PAYMENT_STATUS_PROVIDER_PENDING)
 
