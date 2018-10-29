@@ -21,7 +21,7 @@
         <h4> Band list:</h4>
                 <i>{{info.bands}},</i>
         <h3> Score: {{info.score}}</h3>
-        <a href="#" class="btn btn-default" role="button">Purchase a ticket</a>
+        <a href="{% url 'payment' %}" class="button" role="button">Purchase a ticket</a>
         </div>
         </li>
     {% endfor %}
