@@ -19,6 +19,7 @@ from django_coinpayments.exceptions import CoinPaymentsProviderError
 from django.views.generic import FormView, ListView, DetailView
 from django.shortcuts import get_object_or_404
 from django.http import Http404
+from django.core.mail import send_mail
 
 spot_client_id=settings.SPOT_CLIENT_ID
 spot_secret_id=settings.SPOT_SECRET_ID
@@ -31,7 +32,17 @@ def about(request):
     return render(request, 'festivalpickr/about.html')
 
 def contact(request):
-    return render(request,'festivalpickr/contact.html')
+    if request.method == 'POST':
+        send_mail(
+        request.POST['subject'],
+        request.POST['message'],
+        request.POST['email'],
+        ['festivalpickr@gmail.com'],
+        fail_silently=False,
+        )
+        return redirect('index')
+    else:
+        return render(request,'festivalpickr/contact.html')
 
 def login(request):
     return render(request,'registration/login.html')
