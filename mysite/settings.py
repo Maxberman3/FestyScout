@@ -145,3 +145,4 @@ COINPAYMENTS_ACCEPTED_COINS = (
     ('BTC', 'Bitcoin'), ('ETH', 'Ethereum')
 )
 
+SECURE_SSL_REDIRECT = False

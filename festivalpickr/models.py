@@ -26,7 +26,11 @@ class Festival(models.Model):
     price=models.FloatField(blank=True,null=True,validators=[MinValueValidator(0)])
     latitude=models.FloatField(blank=True,null=True,db_index=True)
     longitude=models.FloatField(blank=True,null=True,db_index=True)
+    def __str__(self):
+        return self.name
 class Band(models.Model):
     name=models.CharField(unique=True,max_length=300,db_index=True)
     songkickid=models.BigIntegerField(blank=True,null=True)
     festivals=models.ManyToManyField(Festival,related_name='bands')
+    def __str__(self):
+        return self.name

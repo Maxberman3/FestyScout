@@ -9,7 +9,6 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
 from django.conf import settings
 from urllib.parse import urlencode
-from django.core.mail import send_mail
 from festivalpickr.utils import songkickcall,ourdbcall
 from .forms import SignUpForm, PaymentForm
 
@@ -54,21 +53,6 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'festivalpickr/signup.html', {'form': form})
-
-def toemail(request):
-    if request.method != 'POST':
-        return render('festivalpicr/error.html',{'problem':'unable to handle the message due to bad request','message':'This url should only be accessed through a post request'})
-    name=request.POST['name']
-    theirmail=request.POST['email']
-    contents=request.POST['message']
-    send_mail(
-    name,
-    contents,
-    theirmail,
-    ['festivalpickr@gmail.com'],
-    fail_silently=False,
-    )
-    return redirect('index')
 
 def getspotify(request):
     if request.method != 'POST':
@@ -178,6 +162,8 @@ def refreshlanding(request):
 
 def create_tx(request, payment):
     context = {}
+    name_of_festival=request.POST['festivalname']
+    price=Festival.objects.get(name=name_of_festival).price
     try:
         tx = payment.create_tx()
         payment.status = Payment.PAYMENT_STATUS_PENDING

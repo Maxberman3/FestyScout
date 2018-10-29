@@ -12,12 +12,10 @@ urlpatterns=[
     path("landing/",views.landing,name='landing'),
     path("refreshlanding",views.refreshlanding,name='refreshlanding'),
     path("contact",views.contact,name='contact'),
-    path("toemail",views.toemail,name='toemail'),
     path("signup",views.signup,name='signup'),
     path("login",views.login,name='login'),
     path('', include('django.contrib.auth.urls')),
     path('', include('django_coinpayments.urls', namespace='django_coinpayments')),
-
     url(r'^payment/$', views.PaymentSetupView.as_view(), name='payment_setup'),
     url(r'^payment/(?P<pk>[0-9a-f-]+)$', views.PaymentDetail.as_view(), name='payment_detail'),
     url(r'^payment/new/(?P<pk>[0-9a-f-]+)$', views.create_new_payment, name='payment_new'),
