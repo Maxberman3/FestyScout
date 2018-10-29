@@ -70,8 +70,6 @@ def signup(request):
         form = SignUpForm()
     return render(request, 'festivalpickr/signup.html', {'form': form})
 
-<<<<<<< HEAD
-=======
 def verify(request, uuid):
     try:
         user = Profile.objects.get(verification_uuid=uuid, is_verified = False)
@@ -83,7 +81,6 @@ def verify(request, uuid):
 
     return redirect('index')
 
->>>>>>> 055aa35ab3f8396d7738fa258266b94262f572a4
 def getspotify(request):
     if request.method != 'POST':
         return render('festivalpicr/error.html',{'problem':'unable to handle due to bad request','message':'This url should only be accessed through a post request'})
