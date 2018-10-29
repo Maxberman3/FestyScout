@@ -2,4 +2,4 @@
 __pycache__/
 settings.py
 migrations/
-templates/festivalpickr/generic.html
+festivalpickr/templates/festivalpickr/generic.html
