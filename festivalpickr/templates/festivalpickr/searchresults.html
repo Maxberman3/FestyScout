@@ -21,7 +21,7 @@
         <h4> Band list:</h4>
                 <i>{{info.bands}},</i>
         <h3> Score: {{info.score}}</h3>
-        <form method="post" action="{% url 'payment_setup' %}">
+        <form method="post" action="{% url 'payment' %}">
           {{% csrf_token %}}
         <button class="btn btn-default" value="{{ festivalname }}" name="festivalname">Purchase a ticket</button>
         </form>

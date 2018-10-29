@@ -11,12 +11,14 @@ from django.conf import settings
 from urllib.parse import urlencode
 from festivalpickr.utils import songkickcall,ourdbcall
 from .forms import SignUpForm, PaymentForm
-
+from .models import Profile
+from festivalpickr.utils import songkickcall
 
 from django_coinpayments.models import Payment
 from django_coinpayments.exceptions import CoinPaymentsProviderError
 from django.views.generic import FormView, ListView, DetailView
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
+from django.http import Http404
 
 spot_client_id=settings.SPOT_CLIENT_ID
 spot_secret_id=settings.SPOT_SECRET_ID
@@ -38,22 +40,50 @@ def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
+
             user = form.save();
             user.refresh_from_db()
             user.profile.address = form.cleaned_data.get('address')
             user.profile.city = form.cleaned_data.get('city')
             user.profile.state = form.cleaned_data.get('state')
             user.profile.zip = form.cleaned_data.get('zip')
+            user.profile.email = form.cleaned_data.get('email')
             user.save()
+
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             django_login(request, user)
+
+            if not user.profile.is_verified:
+                send_mail(
+                    'Verify your FestivalPickr account',
+                    'Follow this link to verify your account: '
+                        'http://127.0.0.1:8000%s' % reverse('verify', kwargs={'uuid': str(user.profile.verification_uuid)}),
+                    'from@festivalpickr.dev',
+                    [user.profile.email],
+                    fail_silently=False,
+                )
+
             return redirect('index')
     else:
         form = SignUpForm()
     return render(request, 'festivalpickr/signup.html', {'form': form})
 
+<<<<<<< HEAD
+=======
+def verify(request, uuid):
+    try:
+        user = Profile.objects.get(verification_uuid=uuid, is_verified = False)
+    except Profile.DoesNotExist:
+        raise Http404("User doesn't exist or is already verified!")
+
+    user.is_verified = True
+    user.save()
+
+    return redirect('index')
+
+>>>>>>> 055aa35ab3f8396d7738fa258266b94262f572a4
 def getspotify(request):
     if request.method != 'POST':
         return render('festivalpicr/error.html',{'problem':'unable to handle due to bad request','message':'This url should only be accessed through a post request'})
@@ -122,7 +152,7 @@ def landing(request):
     'festivals':combo_list,
     }
     return render(request,'festivalpickr/searchresults.html',context)
-# for users who have previously been authorized by spotify, they are rerouted immediately to landing page using their refresh token
+
 def refreshlanding(request):
     if 'refresh_token' not in request.session:
         return render('festivalpickr/error.html',{'problem':'you have not yet been authorized through spotify','message':'Im not even sure how you got here'})
@@ -160,36 +190,38 @@ def refreshlanding(request):
     }
     return render(request,'festivalpickr/searchresults.html',context)
 
-def create_tx(request, payment):
+def create_tx(request, payment, email):
     context = {}
     name_of_festival=request.POST['festivalname']
     price=Festival.objects.get(name=name_of_festival).price
     try:
-        tx = payment.create_tx()
+        tx = payment.create_tx(buyer_email = email)
         payment.status = Payment.PAYMENT_STATUS_PENDING
         payment.save()
         context['object'] = payment
     except CoinPaymentsProviderError as e:
         context['error'] = e
-    return render(request, 'festivalpickr/payment_result.html', context)
+    return render(request, 'festivalpickr/result.html', context)
 
 class PaymentDetail(DetailView):
     model = Payment
-    template_name = 'festivalpickr/payment_result.html'
+    template_name = 'festivalpickr/result.html'
     context_object_name = 'object'
 
 class PaymentSetupView(FormView):
-    template_name = 'festivalpickr/payment_setup.html'
+    template_name = 'festivalpickr/payment.html'
     form_class = PaymentForm
 
     def form_valid(self, form):
         cl = form.cleaned_data
         payment = Payment(currency_original=cl['currency_paid'],
                           currency_paid=cl['currency_paid'],
-                          amount=Decimal(0.05),
+                          amount=Decimal(0.0001),
                           amount_paid=Decimal(0),
                           status=Payment.PAYMENT_STATUS_PROVIDER_PENDING)
-        return create_tx(self.request, payment)
+
+        email = form.cleaned_data.get('email')
+        return create_tx(self.request, payment, email)
 
 def create_new_payment(request, pk):
     payment = get_object_or_404(Payment, pk=pk)
@@ -199,5 +231,5 @@ def create_new_payment(request, pk):
         payment.provider_tx.delete()
     else:
         error = "Invalid status - {}".format(payment.get_status_display())
-        return render(request, 'festivalpickrs/payment_result.html', {'error': error})
+        return render(request, 'festivalpickrs/result.html', {'error': error})
     return create_tx(request, payment)

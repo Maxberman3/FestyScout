@@ -2,7 +2,13 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.core.mail import send_mail
+
+from django.urls import reverse
+from django.db.models import signals
 from django.core.validators import MinValueValidator
+
+import uuid
 
 # Create your models here.
 class Profile(models.Model):
@@ -10,7 +16,10 @@ class Profile(models.Model):
     address = models.CharField(max_length=254, blank=True, null=True)
     state = models.CharField(max_length=13, blank=True, null=True)
     city = models.CharField(max_length=85, blank=True, null=True)
+    email = models.EmailField(max_length=254, blank=True, null=True)
     zip = models.PositiveIntegerField(blank=True, null=True)
+    is_verified = models.BooleanField('verified', default=False)
+    verification_uuid = models.UUIDField('Unique Verification UUID', default=uuid.uuid4)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
