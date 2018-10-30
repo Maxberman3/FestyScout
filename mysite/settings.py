@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 from os.path import join,dirname
+import django_heroku
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -27,9 +28,9 @@ SPOT_CALLBACK=os.environ.get('SPOT_CALLBACK')
 PG_PASSWORD=os.environ.get('PG_PASSWORD')
 SONGKICK_KEY=os.environ.get('SONGKICK_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(os.environ.get('DJANGO_DEBUG', True))
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['festivalpickr.herokuapps.com','127.0.0.1']
 
 
 # Application definition
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -129,9 +131,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static")
-]
+STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')
+#STATICFILES_DIRS = [
+    #os.path.join(BASE_DIR, "static")
+#]
+
 #login redirect
 LOGIN_REDIRECT_URL = '/'
 
@@ -145,10 +149,14 @@ COINPAYMENTS_ACCEPTED_COINS = (
     ('BTC', 'Bitcoin'), ('ETH', 'Ethereum')
 )
 
+#https redirect
 SECURE_SSL_REDIRECT = False
 
+#email stuff
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'festivalpickr'
 EMAIL_HOST_PASSWORD = os.environ.get('GMAIL_PASSWORD')
 EMAIL_USE_TLS = True
+
+django_heroku.settings(locals())
