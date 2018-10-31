@@ -7,7 +7,7 @@ SONGKICK_KEY=settings.SONGKICK_KEY
 def ourdbcall(artist_iterable):
     festivals={}
     for artist in artist_iterable:
-        if Band.objects.filter(name__iexact=artist).exists():
+        if Band.objects.filter(name=artist).exists():
             festival_tour=Band.objects.get(name=artist).festivals
             for festival in festival_tour.all():
                 if festival.name not in festivals:
@@ -28,7 +28,7 @@ def songkickcall(artist_iterable):
     api_key=SONGKICK_KEY
     for artist in artist_iterable:
         artist_in_db=False
-        if Band.objects.filter(name__iexact=artist).exists():
+        if Band.objects.filter(name=artist).exists():
             artist_id=Band.objects.get(name=artist).songkickid
             if (artist_id is not None) and (artist_id != ''):
                 artist_in_db=True
@@ -38,7 +38,7 @@ def songkickcall(artist_iterable):
                 artist_data=json.loads(songkickrequest.text)
                 if artist_data["resultsPage"]["status"]=="ok" and artist_data["resultsPage"]["totalEntries"]>0:
                     artist_id=artist_data["resultsPage"]["results"]['artist'][0]['id']
-                    band_edit=Band.objects.get(name__iexact=artist)
+                    band_edit=Band.objects.get(name=artist)
                     band_edit.save()
                     artist_in_db=True
         if not artist_in_db:
