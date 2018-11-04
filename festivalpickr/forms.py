@@ -43,6 +43,13 @@ class SignUpForm(UserCreationForm):
         has_name_chars(city)
         return city
 
+    def clean_address(self):
+        address=self.cleaned_data['address']
+        for char in address:
+            if char in "!@$%^&*()~,./?;:":
+                raise forms.ValidationError('You included an in Invalid Symbol in the address field')
+        return address
+
 class PaymentForm(ModelForm):
 
     email = forms.EmailField(max_length=254, required=True, help_text='Required')
