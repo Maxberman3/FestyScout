@@ -30,8 +30,13 @@
 									<li><a href="{% url 'contact' %}">Contact Us</a></li>
 								</ul>
 							</li>
+							{% if user.is_authenticated %}
+							<li><a href="#">{{ user.username }}</a></li>
+							<li><a href="{% url 'logout' %}" class="button">Logout</a></li>
+							{% else %}
 							<li><a href="{% url 'signup' %}" class="button">Sign Up</a></li>
 							<li><a href="{% url 'login' %}" class="button">Log In</a></li>
+							{% endif %}
 						</ul>
 					</nav>
 				</header>

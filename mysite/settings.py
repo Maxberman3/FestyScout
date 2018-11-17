@@ -139,6 +139,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 #login redirect
 LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 COINPAYMENTS_ADMIN_ENABLED = True
 # Insert your API keys here

@@ -222,6 +222,10 @@ class PaymentSetupView(FormView):
     def dispatch(self, request, *args, **kwargs):
         try:
             self.festival_dict['festival'] = self.request.POST['festivalname']
+            if self.request.session['festival_purchases']:
+                list.append(self.request.session['festival_purchases'], self.request.POST['festivalname'])
+            else:
+                self.request.session['festival_purchases'] = [self.request.POST['festivalname']]
             return super(PaymentSetupView, self).dispatch(request, *args, **kwargs)
         except:
             return super(PaymentSetupView, self).dispatch(request, *args, **kwargs)

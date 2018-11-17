@@ -21,10 +21,17 @@
         <h4> Band list:</h4>
                 <i>{{info.bands}},</i>
         <h3> Score: {{info.score}}</h3>
+        {% if user.is_authenticated %}
         <form method="post" action="{% url 'payment' %}">
           {% csrf_token %}
           <button class="btn btn-default" value="{{ festivalname }}" name="festivalname">Purchase a ticket</button>
         </form>
+        {% else %}
+        <form method="post" action="{% url 'login' %}">
+          {% csrf_token %}
+          <button class="btn btn-default" value="{{ festivalname }}" name="festivalname">Purchase a ticket</button>
+        </form>
+        {% endif %}
         </div>
         </li>
     {% endfor %}
