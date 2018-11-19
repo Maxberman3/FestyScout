@@ -26,7 +26,11 @@ spot_secret_id=settings.SPOT_SECRET_ID
 spot_uri=settings.SPOT_CALLBACK
 
 def index(request):
-    return render(request,'festivalpickr/index.html')
+    if request.user.is_authenticated:
+        context={'logged_in':True}
+    else:
+        context={'logged_in':True}
+    return render(request,'festivalpickr/index.html',context)
 
 def about(request):
     return render(request, 'festivalpickr/about.html')
@@ -80,7 +84,19 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'festivalpickr/signup.html', {'form': form})
-
+def memberpage(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    else:
+        if 'past_searches_festivals' in request.session:
+            ziplistlist=[]
+            qlength=len(request.session['past_searches_festivals'])
+            for i in range(0,qlength):
+                searchnames=request.session['past_searches_festivals'][i]
+                searchinfo=request.session['past_searches_info'][i]
+                ziplistlist.append(zip(searchnames,searchinfo))
+            context={'past_results':ziplistlist}
+    return render(request,'festivalpickr/test.html',context)
 def verify(request, uuid):
     try:
         user = Profile.objects.get(verification_uuid=uuid, is_verified = False)
@@ -156,9 +172,39 @@ def landing(request):
     for festival in festivals_order:
         sorted_dicts.append(festivals[festival])
     combo_list=zip(festivals_order,sorted_dicts)
+    results_length=len(festivals_order)
     context={
     'festivals':combo_list,
     }
+    if 'past_searches_festivals' in request.session:
+        saved_length=len(request.session['past_searches_festivals'])
+    if 'past_searches_festivals' not in request.session:
+        qnames=[]
+        qinfo=[]
+        if results_length>=5:
+            qnames.append(festivals_order[0:5])
+            qinfo.append(sorted_dicts[0:5])
+        else:
+            qnames.append(festivals_order)
+            qinfo.append(sorted_dicts)
+        request.session['past_searches_festivals']=qnames
+        request.session['past_searches_info']=qinfo
+    elif saved_length<5:
+        if results_length>=5:
+            request.session['past_searches_festivals'].append(festivals_order[0:5])
+            request.session['past_searches_info'].append(sorted_dicts[0:5])
+        else:
+            request.session['past_searches_festivals'].append(festivals_order)
+            request.session['past_searches_info'].append(sorted_dicts)
+    else:
+        request.session['past_searches_festivals'].pop(0)
+        request.session['past_searches_info'].pop(0)
+        if results_length>=5:
+            request.session['past_searches_festivals'].append(festivals_order[0:5])
+            request.session['past_searches_info'].append(sorted_dicts[0:5])
+        else:
+            request.session['past_searches_festivals'].append(festivals_order)
+            request.session['past_searches_info'].append(sorted_dicts)
     return render(request,'festivalpickr/searchresults.html',context)
 
 def refreshlanding(request):
@@ -189,6 +235,7 @@ def refreshlanding(request):
     elif request.session['type']=='songkick':
         festivals=songkickcall(artist_set)
     festivals_order=sorted(festivals,key=lambda k:festivals[k]['score'],reverse=True)
+    results_length=len(festivals_order)
     sorted_dicts=[]
     for festival in festivals_order:
         sorted_dicts.append(festivals[festival])
@@ -196,24 +243,35 @@ def refreshlanding(request):
     context={
     'festivals':combo_list,
     }
-    if 'past_searches' not in request.session:
-        q=Queue()
-        if len(combo_list)>=5:
-            q.put(combo_list[0:5])
+    if 'past_searches_festivals' in request.session:
+        saved_length=len(request.session['past_searches_festivals'])
+    if 'past_searches_festivals' not in request.session:
+        qnames=[]
+        qinfo=[]
+        if results_length>=5:
+            qnames.append(festivals_order[0:5])
+            qinfo.append(sorted_dicts[0:5])
         else:
-            q.put(combo_list)
-        request.session['past_searches']=q
-    elif len(request.session['past_searches'])<5:
-        if len(combo_list)>=5:
-            request.session['past_searches'].put(combo_list[0:5])
+            qnames.append(festivals_order)
+            qinfo.append(sorted_dicts)
+        request.session['past_searches_festivals']=qnames
+        request.session['past_searches_info']=qinfo
+    elif saved_length<5:
+        if results_length>=5:
+            request.session['past_searches_festivals'].append(festivals_order[0:5])
+            request.session['past_searches_info'].append(sorted_dicts[0:5])
         else:
-            request.session['past_searches'].put(combo_list)
+            request.session['past_searches_festivals'].append(festivals_order)
+            request.session['past_searches_info'].append(sorted_dicts)
     else:
-        request.session['past_searches'].pop()
-        if len(combo_list)>=5:
-            request.session['past_searches'].put(combo_list[0:5])
+        request.session['past_searches_festivals'].pop(0)
+        request.session['past_searches_info'].pop(0)
+        if results_length>=5:
+            request.session['past_searches_festivals'].append(festivals_order[0:5])
+            request.session['past_searches_info'].append(sorted_dicts[0:5])
         else:
-            request.session['past_searches'].put(combo_list)
+            request.session['past_searches_festivals'].append(festivals_order)
+            request.session['past_searches_info'].append(sorted_dicts)
     return render(request,'festivalpickr/searchresults.html',context)
 
 def create_tx(request, payment, email):

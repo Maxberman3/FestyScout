@@ -12,7 +12,7 @@ urlpatterns=[
     path("contact",views.contact,name='contact'),
     path("signup",views.signup,name='signup'),
     path("login",views.login,name='login'),
-
+    path('memberpage',views.memberpage,name='memberpage'),
     path("getspotify",views.getspotify,name='getspotify'),
     path("landing/",views.landing,name='landing'),
     path("refreshlanding",views.refreshlanding,name='refreshlanding'),
