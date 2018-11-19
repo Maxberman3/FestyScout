@@ -31,6 +31,7 @@
 								</ul>
 							</li>
 							{% if user.is_authenticated %}
+							<li><a href="{% url 'memberpage' %}">Member's Area</a></li>
 							<li><a href="#">{{ user.username }}</a></li>
 							<li><a href="{% url 'logout' %}" class="button">Logout</a></li>
 							{% else %}

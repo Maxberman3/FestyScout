@@ -92,7 +92,7 @@ def memberpage(request):
                 searchinfo=request.session['past_searches_info'][i]
                 ziplistlist.append(zip(searchnames,searchinfo))
             context={'past_results':ziplistlist}
-    return render(request,'festivalpickr/test.html',context)
+    return render(request,'festivalpickr/memberpage.html',context)
 def verify(request, uuid):
     try:
         user = Profile.objects.get(verification_uuid=uuid, is_verified = False)
