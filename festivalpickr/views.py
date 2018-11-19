@@ -26,10 +26,6 @@ spot_secret_id=settings.SPOT_SECRET_ID
 spot_uri=settings.SPOT_CALLBACK
 
 def index(request):
-    if request.user.is_authenticated:
-        context={'logged_in':True}
-    else:
-        context={'logged_in':True}
     return render(request,'festivalpickr/index.html',context)
 
 def about(request):
