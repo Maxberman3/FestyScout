@@ -196,6 +196,24 @@ def refreshlanding(request):
     context={
     'festivals':combo_list,
     }
+    if 'past_searches' not in request.session:
+        q=Queue()
+        if len(combo_list)>=5:
+            q.put(combo_list[0:5])
+        else:
+            q.put(combo_list)
+        request.session['past_searches']=q
+    elif len(request.session['past_searches'])<5:
+        if len(combo_list)>=5:
+            request.session['past_searches'].put(combo_list[0:5])
+        else:
+            request.session['past_searches'].put(combo_list)
+    else:
+        request.session['past_searches'].pop()
+        if len(combo_list)>=5:
+            request.session['past_searches'].put(combo_list[0:5])
+        else:
+            request.session['past_searches'].put(combo_list)
     return render(request,'festivalpickr/searchresults.html',context)
 
 def create_tx(request, payment, email):
