@@ -26,6 +26,10 @@ spot_secret_id=settings.SPOT_SECRET_ID
 spot_uri=settings.SPOT_CALLBACK
 
 def index(request):
+    if request.user.is_authenticated:
+        context={'logged_in':True}
+    else:
+        context={'logged_in':True}
     return render(request,'festivalpickr/index.html',context)
 
 def about(request):
@@ -92,7 +96,7 @@ def memberpage(request):
                 searchinfo=request.session['past_searches_info'][i]
                 ziplistlist.append(zip(searchnames,searchinfo))
             context={'past_results':ziplistlist}
-    return render(request,'festivalpickr/test.html',context)
+    return render(request,'festivalpickr/memberpage.html',context)
 def verify(request, uuid):
     try:
         user = Profile.objects.get(verification_uuid=uuid, is_verified = False)
