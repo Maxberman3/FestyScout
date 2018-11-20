@@ -26,7 +26,7 @@ spot_secret_id=settings.SPOT_SECRET_ID
 spot_uri=settings.SPOT_CALLBACK
 
 def index(request):
-    return render(request,'festivalpickr/index.html',context)
+    return render(request,'festivalpickr/index.html')
 
 def about(request):
     return render(request, 'festivalpickr/about.html')
@@ -92,6 +92,8 @@ def memberpage(request):
                 searchinfo=request.session['past_searches_info'][i]
                 ziplistlist.append(zip(searchnames,searchinfo))
             context={'past_results':ziplistlist}
+        else:
+            context={'past_results':[]}
     return render(request,'festivalpickr/memberpage.html',context)
 def verify(request, uuid):
     try:
