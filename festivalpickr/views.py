@@ -147,6 +147,10 @@ def landing(request):
     lib_request_url='https://api.spotify.com/v1/me/tracks'
     lib_request=requests.get(lib_request_url,headers=authorization_header)
     lib_data=json.loads(lib_request.text)
+    coin_data = []
+    crypto_data = requests.get('https://api.coinmarketcap.com/v1/ticker')
+    for coin in crypto_data.json()[:3]:
+        list.append(coin_data, [coin['name'], coin['price_usd'], coin['symbol']])
     artist_set=set()
     if 'items' not in lib_data:
         print(lib_data)
@@ -167,10 +171,20 @@ def landing(request):
         festivals=songkickcall(artist_set)
     festivals_order=sorted(festivals,key=lambda k:festivals[k]['score'],reverse=True)
     sorted_dicts=[]
+    fest_objects = []
     for festival in festivals_order:
         sorted_dicts.append(festivals[festival])
-    combo_list=zip(festivals_order,sorted_dicts)
+        for fest_object in Festival.objects.all():
+            if fest_object.name == festival:
+                list.append(fest_objects, fest_object)
     results_length=len(festivals_order)
+    converted_prices = []
+    for festival in fest_objects:
+        price_list = []
+        for coin in coin_data:
+            list.append(price_list, [coin[0], float(festival.price) / float(coin[1]), coin[2]])
+        list.append(converted_prices, price_list)
+    combo_list=zip(festivals_order, sorted_dicts, fest_objects, converted_prices)
     context={
     'festivals':combo_list,
     }
@@ -217,6 +231,10 @@ def refreshlanding(request):
     lib_request_url='https://api.spotify.com/v1/me/tracks'
     lib_request=requests.get(lib_request_url,headers=authorization_header)
     lib_data=json.loads(lib_request.text)
+    coin_data = []
+    crypto_data = requests.get('https://api.coinmarketcap.com/v1/ticker')
+    for coin in crypto_data.json()[:3]:
+        list.append(coin_data, [coin['name'], coin['price_usd'], coin['symbol']])
     artist_set=set()
     while True:
         for item in lib_data['items']:
@@ -235,9 +253,20 @@ def refreshlanding(request):
     festivals_order=sorted(festivals,key=lambda k:festivals[k]['score'],reverse=True)
     results_length=len(festivals_order)
     sorted_dicts=[]
+    fest_objects = []
     for festival in festivals_order:
         sorted_dicts.append(festivals[festival])
-    combo_list=zip(festivals_order,sorted_dicts)
+        for fest_object in Festival.objects.all():
+            if fest_object.name == festival:
+                list.append(fest_objects, fest_object)
+    converted_prices = []
+    for festival in fest_objects:
+        price_list = []
+        for coin in coin_data:
+            list.append(price_list, [coin[0], float(festival.price) / float(coin[1]), coin[2]])
+        list.append(converted_prices, price_list)
+    print(converted_prices)
+    combo_list=zip(festivals_order, sorted_dicts, fest_objects, converted_prices)
     context={
     'festivals':combo_list,
     }
