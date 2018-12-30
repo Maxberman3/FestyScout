@@ -7,11 +7,8 @@
 						<section id="banner">
 							<h2 style="font-weight: 500">FestivalPickr</h2>
 							<ul class="actions special">
-								<li><form action="{% url 'getspotify' %}" method="post">
-									{%csrf_token%}
-								<button class="button primary" name="songkick">Search with Songkick</button>
-								</form></li>
-								<li><form action="{% url 'getspotify' %}" method="post">{%csrf_token%}<button class="button" name="our_db">Search with Database</button></form></li>
+								<li><a href="#" class="button">Enter Artists Manually</a></li>
+								<li><a href="{% url 'getspotify' %}" class="button primary">Connect with Spotify</a></li>
 							</ul>
 						</section>
 

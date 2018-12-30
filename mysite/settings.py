@@ -153,7 +153,7 @@ LOGOUT_REDIRECT_URL = '/'
 # )
 
 #https redirect
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = False
 
 #email stuff
 EMAIL_HOST = 'smtp.gmail.com'

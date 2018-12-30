@@ -10,11 +10,11 @@ from django.contrib.auth import login as django_login
 from django.conf import settings
 from django.http import HttpResponse
 from urllib.parse import urlencode
-from festivalpickr.utils import songkickcall,ourdbcall
+#from festivalpickr.utils import songkickcall,ourdbcall
+from festivalpickr.utils import ourdbcall
 #from .forms import SignUpForm, PaymentForm
 from .forms import SignUpForm
 from .models import Profile, Festival
-from festivalpickr.utils import songkickcall
 # from django_coinpayments.models import Payment
 # from django_coinpayments.exceptions import CoinPaymentsProviderError
 from django.views.generic import FormView, ListView, DetailView
@@ -116,14 +116,14 @@ def verify(request, uuid):
 
 #Handles initial call to spotify
 def getspotify(request):
-    if request.method != 'POST':
-        return render('festivalpicr/error.html',{'problem':'unable to handle due to bad request','message':'This url should only be accessed through a post request'})
-    if "songkick" in request.POST:
-        request.session['type']='songkick'
-    elif "our_db" in request.POST:
-        request.session['type']='our_db'
-    else:
-        return render('festivalpicr/error.html',{'problem':'unable to handle due to bad request','message':'post request contained incorrect information'})
+    # if request.method != 'POST':
+    #     return render('festivalpicr/error.html',{'problem':'unable to handle due to bad request','message':'This url should only be accessed through a post request'})
+    # if "songkick" in request.POST:
+    #     request.session['type']='songkick'
+    # elif "our_db" in request.POST:
+    #     request.session['type']='our_db'
+    # else:
+    #     return render('festivalpicr/error.html',{'problem':'unable to handle due to bad request','message':'post request contained incorrect information'})
     if "refresh_token" in request.session:
         return redirect(reverse('refreshlanding'))
     state=secrets.token_urlsafe(20)
@@ -176,10 +176,13 @@ def landing(request):
             lib_request_url=lib_data['next']
             lib_request=requests.get(lib_request_url,headers=authorization_header)
             lib_data=json.loads(lib_request.text)
-    if request.session['type']=='our_db':
-        festivals=ourdbcall(artist_set)
-    elif request.session['type']=='songkick':
-        festivals=songkickcall(artist_set)
+    # if request.session['type']=='our_db':
+    #     festivals=ourdbcall(artist_set)
+    # elif request.session['type']=='songkick':
+    #     festivals=songkickcall(artist_set)
+    festivals=ourdbcall(artist_set)
+    print('here are the festivals from tehe db:')
+    print(festivals)
     festivals_order=sorted(festivals,key=lambda k:festivals[k]['score'],reverse=True)
     sorted_dicts=[]
     fest_objects = []
@@ -262,20 +265,23 @@ def refreshlanding(request):
             lib_request_url=lib_data['next']
             lib_request=requests.get(lib_request_url,headers=authorization_header)
             lib_data=json.loads(lib_request.text)
-    if request.session['type']=='our_db':
-        festivals=ourdbcall(artist_set)
-    elif request.session['type']=='songkick':
-        festivals=songkickcall(artist_set)
+    # if request.session['type']=='our_db':
+    #     festivals=ourdbcall(artist_set)
+    # elif request.session['type']=='songkick':
+    #     festivals=songkickcall(artist_set)
+    festivals=ourdbcall(artist_set)
+    print('here are the festivals from the db:')
+    print(festivals)
     festivals_order=sorted(festivals,key=lambda k:festivals[k]['score'],reverse=True)
     results_length=len(festivals_order)
     sorted_dicts=[]
-    #COMMENTS BELOW PERTAIN TO BITCOIN PAYMENTS
+    # COMMENTS BELOW PERTAIN TO BITCOIN PAYMENTS
     # fest_objects = []
-    # for festival in festivals_order:
-    #     sorted_dicts.append(festivals[festival])
-    #     for fest_object in Festival.objects.all():
-    #         if fest_object.name == festival:
-    #             list.append(fest_objects, fest_object)
+    for festival in festivals_order:
+        sorted_dicts.append(festivals[festival])
+        # for fest_object in Festival.objects.all():
+        #     if fest_object.name == festival:
+        #         list.append(fest_objects, fest_object)
     # converted_prices = []
     # for festival in fest_objects:
     #     price_list = []
