@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'festivalpickr.apps.FestivalpickrConfig',
     'localflavor',
-    'django_coinpayments',
+    #'django_coinpayments',
 ]
 
 MIDDLEWARE = [
@@ -141,18 +141,19 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-COINPAYMENTS_ADMIN_ENABLED = True
-# Insert your API keys here
-COINPAYMENTS_API_KEY = '791c8d12e23fbd6adac0f4cd520f231ff75b5f93a04866d39300dd203f06a397'
-COINPAYMENTS_API_SECRET = 'E07310f10704606F08b807eA1D6EA9376D046Da108Afce66c93E0b9c3ea86cE2'
+#BELOW COMMENTS PERTAIN TO SETTING UP BTC PAYMENTS
+# COINPAYMENTS_ADMIN_ENABLED = True
+# # Insert your API keys here
+# COINPAYMENTS_API_KEY = '791c8d12e23fbd6adac0f4cd520f231ff75b5f93a04866d39300dd203f06a397'
+# COINPAYMENTS_API_SECRET = 'E07310f10704606F08b807eA1D6EA9376D046Da108Afce66c93E0b9c3ea86cE2'
 
 # has EOS - overrides choices for 'currency_original' and 'currency_paid' in Payment model
-COINPAYMENTS_ACCEPTED_COINS = (
-    ('BTC', 'Bitcoin'), ('ETH', 'Ethereum')
-)
+# COINPAYMENTS_ACCEPTED_COINS = (
+#     ('BTC', 'Bitcoin'), ('ETH', 'Ethereum')
+# )
 
 #https redirect
-SECURE_SSL_REDIRECT = False
+SECURE_SSL_REDIRECT = True
 
 #email stuff
 EMAIL_HOST = 'smtp.gmail.com'

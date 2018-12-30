@@ -2,7 +2,6 @@ Django==2.1.2
 psycopg2==2.7.5
 requests>=2.20.0
 django-localflavor==2.1
-django-coinpayments==0.1.2
 whitenoise==4.0
 gunicorn==19.9.0
 django-heroku==0.3.1

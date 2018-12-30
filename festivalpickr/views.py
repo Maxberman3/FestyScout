@@ -11,11 +11,12 @@ from django.conf import settings
 from django.http import HttpResponse
 from urllib.parse import urlencode
 from festivalpickr.utils import songkickcall,ourdbcall
-from .forms import SignUpForm, PaymentForm
+#from .forms import SignUpForm, PaymentForm
+from .forms import SignUpForm
 from .models import Profile, Festival
 from festivalpickr.utils import songkickcall
-from django_coinpayments.models import Payment
-from django_coinpayments.exceptions import CoinPaymentsProviderError
+# from django_coinpayments.models import Payment
+# from django_coinpayments.exceptions import CoinPaymentsProviderError
 from django.views.generic import FormView, ListView, DetailView
 from django.shortcuts import get_object_or_404
 from django.http import Http404
@@ -25,12 +26,15 @@ spot_client_id=settings.SPOT_CLIENT_ID
 spot_secret_id=settings.SPOT_SECRET_ID
 spot_uri=settings.SPOT_CALLBACK
 
+#renders index
 def index(request):
     return render(request,'festivalpickr/index.html')
 
+#renders about us page
 def about(request):
     return render(request, 'festivalpickr/about.html')
 
+#renders contact page and handles contact form/sends email
 def contact(request):
     if request.method == 'POST':
         send_mail(
@@ -44,9 +48,11 @@ def contact(request):
     else:
         return render(request,'festivalpickr/contact.html')
 
+#renders login page
 def login(request):
     return render(request,'registration/login.html')
 
+#renders signup page and handles submission
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -80,21 +86,23 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'festivalpickr/signup.html', {'form': form})
-def memberpage(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    else:
-        if 'past_searches_festivals' in request.session:
-            ziplistlist=[]
-            qlength=len(request.session['past_searches_festivals'])
-            for i in range(0,qlength):
-                searchnames=request.session['past_searches_festivals'][i]
-                searchinfo=request.session['past_searches_info'][i]
-                ziplistlist.append(zip(searchnames,searchinfo))
-            context={'past_results':ziplistlist}
-        else:
-            context={'past_results':[]}
-    return render(request,'festivalpickr/memberpage.html',context)
+# Renders memberpage and retrieves previous searches from session. Currently commented out for simplicity sake.
+# def memberpage(request):
+#     if not request.user.is_authenticated:
+#         return redirect('login')
+#     else:
+#         if 'past_searches_festivals' in request.session:
+#             ziplistlist=[]
+#             qlength=len(request.session['past_searches_festivals'])
+#             for i in range(0,qlength):
+#                 searchnames=request.session['past_searches_festivals'][i]
+#                 searchinfo=request.session['past_searches_info'][i]
+#                 ziplistlist.append(zip(searchnames,searchinfo))
+#             context={'past_results':ziplistlist}
+#         else:
+#             context={'past_results':[]}
+#     return render(request,'festivalpickr/memberpage.html',context)
+
 def verify(request, uuid):
     try:
         user = Profile.objects.get(verification_uuid=uuid, is_verified = False)
@@ -106,6 +114,7 @@ def verify(request, uuid):
 
     return redirect('index')
 
+#Handles initial call to spotify
 def getspotify(request):
     if request.method != 'POST':
         return render('festivalpicr/error.html',{'problem':'unable to handle due to bad request','message':'This url should only be accessed through a post request'})
@@ -125,6 +134,7 @@ def getspotify(request):
     auth_url = "{}/?{}".format('https://accounts.spotify.com/authorize', url_args)
     return redirect(auth_url)
 
+#landing page that handles the scoring of matching of festivals with spotify artists against the API calls to the songkick database
 def landing(request):
     if 'error' in request.GET:
         return render('festivalpickr/error.html',{'problem':'spotify authorization failed','message':'Either you failed to give permission to the app or there was a faulty connection'})
@@ -147,10 +157,11 @@ def landing(request):
     lib_request_url='https://api.spotify.com/v1/me/tracks'
     lib_request=requests.get(lib_request_url,headers=authorization_header)
     lib_data=json.loads(lib_request.text)
-    coin_data = []
-    crypto_data = requests.get('https://api.coinmarketcap.com/v1/ticker')
-    for coin in crypto_data.json()[:3]:
-        list.append(coin_data, [coin['name'], coin['price_usd'], coin['symbol']])
+    #COMMENTS BELOW PERTAIN TO BITCOIN PAYMENTS
+    # coin_data = []
+    # crypto_data = requests.get('https://api.coinmarketcap.com/v1/ticker')
+    # for coin in crypto_data.json()[:3]:
+    #     list.append(coin_data, [coin['name'], coin['price_usd'], coin['symbol']])
     artist_set=set()
     if 'items' not in lib_data:
         print(lib_data)
@@ -174,51 +185,55 @@ def landing(request):
     fest_objects = []
     for festival in festivals_order:
         sorted_dicts.append(festivals[festival])
-        for fest_object in Festival.objects.all():
-            if fest_object.name == festival:
-                list.append(fest_objects, fest_object)
-    results_length=len(festivals_order)
-    converted_prices = []
-    for festival in fest_objects:
-        price_list = []
-        for coin in coin_data:
-            list.append(price_list, [coin[0], float(festival.price) / float(coin[1]), coin[2]])
-        list.append(converted_prices, price_list)
-    combo_list=zip(festivals_order, sorted_dicts, fest_objects, converted_prices)
+        #COMMENTS BELOW PERTAIN TO BITCOIN PAYMENTS. REMOVED ATM FOR SIMPLICITY
+        # for fest_object in Festival.objects.all():
+        #     if fest_object.name == festival:
+        #         list.append(fest_objects, fest_object)
+    # results_length=len(festivals_order)
+    # converted_prices = []
+    # for festival in fest_objects:
+    #     price_list = []
+    #     for coin in coin_data:
+    #         list.append(price_list, [coin[0], float(festival.price) / float(coin[1]), coin[2]])
+    #     list.append(converted_prices, price_list)
+    # combo_list=zip(festivals_order, sorted_dicts, fest_objects, converted_prices)
+    combo_list=zip(festivals_order,sorted_dicts)
     context={
     'festivals':combo_list,
     }
-    if 'past_searches_festivals' in request.session:
-        saved_length=len(request.session['past_searches_festivals'])
-    if 'past_searches_festivals' not in request.session:
-        qnames=[]
-        qinfo=[]
-        if results_length>=5:
-            qnames.append(festivals_order[0:5])
-            qinfo.append(sorted_dicts[0:5])
-        else:
-            qnames.append(festivals_order)
-            qinfo.append(sorted_dicts)
-        request.session['past_searches_festivals']=qnames
-        request.session['past_searches_info']=qinfo
-    elif saved_length<5:
-        if results_length>=5:
-            request.session['past_searches_festivals'].append(festivals_order[0:5])
-            request.session['past_searches_info'].append(sorted_dicts[0:5])
-        else:
-            request.session['past_searches_festivals'].append(festivals_order)
-            request.session['past_searches_info'].append(sorted_dicts)
-    else:
-        request.session['past_searches_festivals'].pop(0)
-        request.session['past_searches_info'].pop(0)
-        if results_length>=5:
-            request.session['past_searches_festivals'].append(festivals_order[0:5])
-            request.session['past_searches_info'].append(sorted_dicts[0:5])
-        else:
-            request.session['past_searches_festivals'].append(festivals_order)
-            request.session['past_searches_info'].append(sorted_dicts)
+    # COMMENTS BELOW PERTAIN TO SAVING PREVIOUS SEARCHES TO SESSION, REMOVED ATM FOR SIMPLICITY
+    # if 'past_searches_festivals' in request.session:
+    #     saved_length=len(request.session['past_searches_festivals'])
+    # if 'past_searches_festivals' not in request.session:
+    #     qnames=[]
+    #     qinfo=[]
+    #     if results_length>=5:
+    #         qnames.append(festivals_order[0:5])
+    #         qinfo.append(sorted_dicts[0:5])
+    #     else:
+    #         qnames.append(festivals_order)
+    #         qinfo.append(sorted_dicts)
+    #     request.session['past_searches_festivals']=qnames
+    #     request.session['past_searches_info']=qinfo
+    # elif saved_length<5:
+    #     if results_length>=5:
+    #         request.session['past_searches_festivals'].append(festivals_order[0:5])
+    #         request.session['past_searches_info'].append(sorted_dicts[0:5])
+    #     else:
+    #         request.session['past_searches_festivals'].append(festivals_order)
+    #         request.session['past_searches_info'].append(sorted_dicts)
+    # else:
+    #     request.session['past_searches_festivals'].pop(0)
+    #     request.session['past_searches_info'].pop(0)
+    #     if results_length>=5:
+    #         request.session['past_searches_festivals'].append(festivals_order[0:5])
+    #         request.session['past_searches_info'].append(sorted_dicts[0:5])
+    #     else:
+    #         request.session['past_searches_festivals'].append(festivals_order)
+    #         request.session['past_searches_info'].append(sorted_dicts)
     return render(request,'festivalpickr/searchresults.html',context)
 
+#Landing page for handling spotify calls with a refresh token.
 def refreshlanding(request):
     if 'refresh_token' not in request.session:
         return render('festivalpickr/error.html',{'problem':'you have not yet been authorized through spotify','message':'Im not even sure how you got here'})
@@ -231,10 +246,11 @@ def refreshlanding(request):
     lib_request_url='https://api.spotify.com/v1/me/tracks'
     lib_request=requests.get(lib_request_url,headers=authorization_header)
     lib_data=json.loads(lib_request.text)
-    coin_data = []
-    crypto_data = requests.get('https://api.coinmarketcap.com/v1/ticker')
-    for coin in crypto_data.json()[:3]:
-        list.append(coin_data, [coin['name'], coin['price_usd'], coin['symbol']])
+    #COMMENTS BELOW PERTAIN TO BITCOIN PAYMENTS
+    # coin_data = []
+    # crypto_data = requests.get('https://api.coinmarketcap.com/v1/ticker')
+    # for coin in crypto_data.json()[:3]:
+    #     list.append(coin_data, [coin['name'], coin['price_usd'], coin['symbol']])
     artist_set=set()
     while True:
         for item in lib_data['items']:
@@ -253,106 +269,109 @@ def refreshlanding(request):
     festivals_order=sorted(festivals,key=lambda k:festivals[k]['score'],reverse=True)
     results_length=len(festivals_order)
     sorted_dicts=[]
-    fest_objects = []
-    for festival in festivals_order:
-        sorted_dicts.append(festivals[festival])
-        for fest_object in Festival.objects.all():
-            if fest_object.name == festival:
-                list.append(fest_objects, fest_object)
-    converted_prices = []
-    for festival in fest_objects:
-        price_list = []
-        for coin in coin_data:
-            list.append(price_list, [coin[0], float(festival.price) / float(coin[1]), coin[2]])
-        list.append(converted_prices, price_list)
-    print(converted_prices)
-    combo_list=zip(festivals_order, sorted_dicts, fest_objects, converted_prices)
+    #COMMENTS BELOW PERTAIN TO BITCOIN PAYMENTS
+    # fest_objects = []
+    # for festival in festivals_order:
+    #     sorted_dicts.append(festivals[festival])
+    #     for fest_object in Festival.objects.all():
+    #         if fest_object.name == festival:
+    #             list.append(fest_objects, fest_object)
+    # converted_prices = []
+    # for festival in fest_objects:
+    #     price_list = []
+    #     for coin in coin_data:
+    #          list.append(price_list, [coin[0], float(festival.price) / float(coin[1]), coin[2]])
+    #     list.append(converted_prices, price_list)
+    # print(converted_prices)
+    # combo_list=zip(festivals_order, sorted_dicts, fest_objects, converted_prices)
+    combo_list=zip(festivals_order,sorted_dicts)
     context={
     'festivals':combo_list,
     }
-    if 'past_searches_festivals' in request.session:
-        saved_length=len(request.session['past_searches_festivals'])
-    if 'past_searches_festivals' not in request.session:
-        qnames=[]
-        qinfo=[]
-        if results_length>=5:
-            qnames.append(festivals_order[0:5])
-            qinfo.append(sorted_dicts[0:5])
-        else:
-            qnames.append(festivals_order)
-            qinfo.append(sorted_dicts)
-        request.session['past_searches_festivals']=qnames
-        request.session['past_searches_info']=qinfo
-    elif saved_length<5:
-        if results_length>=5:
-            request.session['past_searches_festivals'].append(festivals_order[0:5])
-            request.session['past_searches_info'].append(sorted_dicts[0:5])
-        else:
-            request.session['past_searches_festivals'].append(festivals_order)
-            request.session['past_searches_info'].append(sorted_dicts)
-    else:
-        request.session['past_searches_festivals'].pop(0)
-        request.session['past_searches_info'].pop(0)
-        if results_length>=5:
-            request.session['past_searches_festivals'].append(festivals_order[0:5])
-            request.session['past_searches_info'].append(sorted_dicts[0:5])
-        else:
-            request.session['past_searches_festivals'].append(festivals_order)
-            request.session['past_searches_info'].append(sorted_dicts)
+    #COMMENTS BELOW PERTAIN TO SAVING SEARCH RESULTS TO SESSION
+    # if 'past_searches_festivals' in request.session:
+    #     saved_length=len(request.session['past_searches_festivals'])
+    # if 'past_searches_festivals' not in request.session:
+    #     qnames=[]
+    #     qinfo=[]
+    #     if results_length>=5:
+    #         qnames.append(festivals_order[0:5])
+    #         qinfo.append(sorted_dicts[0:5])
+    #     else:
+    #         qnames.append(festivals_order)
+    #         qinfo.append(sorted_dicts)
+    #     request.session['past_searches_festivals']=qnames
+    #     request.session['past_searches_info']=qinfo
+    # elif saved_length<5:
+    #     if results_length>=5:
+    #         request.session['past_searches_festivals'].append(festivals_order[0:5])
+    #         request.session['past_searches_info'].append(sorted_dicts[0:5])
+    #     else:
+    #         request.session['past_searches_festivals'].append(festivals_order)
+    #         request.session['past_searches_info'].append(sorted_dicts)
+    # else:
+    #     request.session['past_searches_festivals'].pop(0)
+    #     request.session['past_searches_info'].pop(0)
+    #     if results_length>=5:
+    #         request.session['past_searches_festivals'].append(festivals_order[0:5])
+    #         request.session['past_searches_info'].append(sorted_dicts[0:5])
+    #     else:
+    #         request.session['past_searches_festivals'].append(festivals_order)
+    #         request.session['past_searches_info'].append(sorted_dicts)
     return render(request,'festivalpickr/searchresults.html',context)
-
-def create_tx(request, payment, email):
-    context = {}
-    try:
-        tx = payment.create_tx(buyer_email = email)
-        payment.status = Payment.PAYMENT_STATUS_PENDING
-        payment.save()
-        context['object'] = payment
-    except CoinPaymentsProviderError as e:
-        context['error'] = e
-    return render(request, 'festivalpickr/result.html', context)
-
-class PaymentDetail(DetailView):
-    model = Payment
-    template_name = 'festivalpickr/result.html'
-    context_object_name = 'object'
-
-class PaymentSetupView(FormView):
-    template_name = 'festivalpickr/payment.html'
-    form_class = PaymentForm
-    festival_dict = {}
-
-    def dispatch(self, request, *args, **kwargs):
-        try:
-            self.festival_dict['festival'] = self.request.POST['festivalname']
-            if self.request.session['festival_purchases']:
-                list.append(self.request.session['festival_purchases'], self.request.POST['festivalname'])
-            else:
-                self.request.session['festival_purchases'] = [self.request.POST['festivalname']]
-            return super(PaymentSetupView, self).dispatch(request, *args, **kwargs)
-        except:
-            return super(PaymentSetupView, self).dispatch(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        cl = form.cleaned_data
-        festival = self.festival_dict['festival']
-        price = Festival.objects.get(name=festival).price
-        payment = Payment(currency_original='USD',
-                          currency_paid=cl['currency_paid'],
-                          amount=Decimal(price),
-                          amount_paid=Decimal(0),
-                          status=Payment.PAYMENT_STATUS_PROVIDER_PENDING)
-
-        email = form.cleaned_data.get('email')
-        return create_tx(self.request, payment, email)
-
-def create_new_payment(request, pk):
-    payment = get_object_or_404(Payment, pk=pk)
-    if payment.status in [Payment.PAYMENT_STATUS_PROVIDER_PENDING, Payment.PAYMENT_STATUS_TIMEOUT]:
-        pass
-    elif payment.status in [Payment.PAYMENT_STATUS_PENDING]:
-        payment.provider_tx.delete()
-    else:
-        error = "Invalid status - {}".format(payment.get_status_display())
-        return render(request, 'festivalpickrs/result.html', {'error': error})
-    return create_tx(request, payment)
+#COMMENTS BELOW DEAL WITH BITCOIN PAYMENT SYSTEM
+# def create_tx(request, payment, email):
+#     context = {}
+#     try:
+#         tx = payment.create_tx(buyer_email = email)
+#         payment.status = Payment.PAYMENT_STATUS_PENDING
+#         payment.save()
+#         context['object'] = payment
+#     except CoinPaymentsProviderError as e:
+#         context['error'] = e
+#     return render(request, 'festivalpickr/result.html', context)
+#
+# class PaymentDetail(DetailView):
+#     model = Payment
+#     template_name = 'festivalpickr/result.html'
+#     context_object_name = 'object'
+#
+# class PaymentSetupView(FormView):
+#     template_name = 'festivalpickr/payment.html'
+#     form_class = PaymentForm
+#     festival_dict = {}
+#
+#     def dispatch(self, request, *args, **kwargs):
+#         try:
+#             self.festival_dict['festival'] = self.request.POST['festivalname']
+#             if self.request.session['festival_purchases']:
+#                 list.append(self.request.session['festival_purchases'], self.request.POST['festivalname'])
+#             else:
+#                 self.request.session['festival_purchases'] = [self.request.POST['festivalname']]
+#             return super(PaymentSetupView, self).dispatch(request, *args, **kwargs)
+#         except:
+#             return super(PaymentSetupView, self).dispatch(request, *args, **kwargs)
+#
+#     def form_valid(self, form):
+#         cl = form.cleaned_data
+#         festival = self.festival_dict['festival']
+#         price = Festival.objects.get(name=festival).price
+#         payment = Payment(currency_original='USD',
+#                           currency_paid=cl['currency_paid'],
+#                           amount=Decimal(price),
+#                           amount_paid=Decimal(0),
+#                           status=Payment.PAYMENT_STATUS_PROVIDER_PENDING)
+#
+#         email = form.cleaned_data.get('email')
+#         return create_tx(self.request, payment, email)
+#
+# def create_new_payment(request, pk):
+#     payment = get_object_or_404(Payment, pk=pk)
+#     if payment.status in [Payment.PAYMENT_STATUS_PROVIDER_PENDING, Payment.PAYMENT_STATUS_TIMEOUT]:
+#         pass
+#     elif payment.status in [Payment.PAYMENT_STATUS_PENDING]:
+#         payment.provider_tx.delete()
+#     else:
+#         error = "Invalid status - {}".format(payment.get_status_display())
+#         return render(request, 'festivalpickrs/result.html', {'error': error})
+#     return create_tx(request, payment)

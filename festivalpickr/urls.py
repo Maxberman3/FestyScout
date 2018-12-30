@@ -12,17 +12,18 @@ urlpatterns=[
     path("contact",views.contact,name='contact'),
     path("signup",views.signup,name='signup'),
     path("login",views.login,name='login'),
-    path('memberpage',views.memberpage,name='memberpage'),
+    #path('memberpage',views.memberpage,name='memberpage'),
     path("getspotify",views.getspotify,name='getspotify'),
     path("landing/",views.landing,name='landing'),
     path("refreshlanding",views.refreshlanding,name='refreshlanding'),
 
     path('', include('django.contrib.auth.urls')),
-    path('', include('django_coinpayments.urls', namespace='django_coinpayments')),
-
-    url(r'^payment/$', views.PaymentSetupView.as_view(), name='payment'),
-    url(r'^payment/(?P<pk>[0-9a-f-]+)$', views.PaymentDetail.as_view(), name='payment_detail'),
-    url(r'^payment/new/(?P<pk>[0-9a-f-]+)$', views.create_new_payment, name='payment_new'),
+    #COMMENTS BELOW ARE URLS WHICH HANDLE BITCOIN PAYMENT FUNCTIONALITY
+    # path('', include('django_coinpayments.urls', namespace='django_coinpayments')),
+    #
+    # url(r'^payment/$', views.PaymentSetupView.as_view(), name='payment'),
+    # url(r'^payment/(?P<pk>[0-9a-f-]+)$', views.PaymentDetail.as_view(), name='payment_detail'),
+    # url(r'^payment/new/(?P<pk>[0-9a-f-]+)$', views.create_new_payment, name='payment_new'),
 
     url(r'^verify/(?P<uuid>[a-z0-9\-]+)/', views.verify, name='verify'),
 

@@ -14,14 +14,15 @@
 <!-- Main -->
   <section id="main" class="container">
     <ul>
-    {% for festivalname,info,object,price_list in festivals %}
+    <!-- {% for festivalname,info,object,price_list in festivals %} -->
+    {% for festivalname,info in festivals %}
     <li>
       <div class="box">
         <h3> Name: {{festivalname}}</h3>
         <h4> Band List:</h4>
                 <i>{{info.bands}},</i>
         <h3> Score: {{info.score}}</h3>
-        <h3> Price: {{object.price}} USD</h3>
+        <!-- <h3> Price: {{object.price}} USD</h3>
         <h3> Converted Prices:
           {% for name, price, symbol in price_list %}
             <div id={{name}} class="group">{{price}} {{symbol}}</div>
@@ -37,7 +38,7 @@
           {% csrf_token %}
           <button class="btn btn-default" value="{{ festivalname }}" name="festivalname">Purchase a ticket</button>
         </form>
-        {% endif %}
+        {% endif %} -->
         </div>
         </li>
     {% endfor %}

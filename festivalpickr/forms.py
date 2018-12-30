@@ -4,7 +4,7 @@ from localflavor.us.forms import USZipCodeField, USStateSelect, USStateField
 from festivalpickr.utils import has_name_chars
 
 from django.forms import ModelForm
-from django_coinpayments.models import Payment
+# from django_coinpayments.models import Payment
 from django.contrib.auth.forms import UserCreationForm
 
 class SignUpForm(UserCreationForm):
@@ -49,11 +49,11 @@ class SignUpForm(UserCreationForm):
             if char in "!@$%^&*()~,./?;:":
                 raise forms.ValidationError('You included an in Invalid Symbol in the address field')
         return address
-
-class PaymentForm(ModelForm):
-
-    email = forms.EmailField(max_length=254, required=True, help_text='Required')
-
-    class Meta:
-        model = Payment
-        fields = ['email', 'currency_paid']
+# FORM CLASS TO HANDLE BITCOIN PAYMENTS
+# class PaymentForm(ModelForm):
+#
+#     email = forms.EmailField(max_length=254, required=True, help_text='Required')
+#
+#     class Meta:
+#         model = Payment
+#         fields = ['email', 'currency_paid']
