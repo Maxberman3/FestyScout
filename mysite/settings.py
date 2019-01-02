@@ -28,7 +28,7 @@ SPOT_CALLBACK=os.environ.get('SPOT_CALLBACK')
 PG_PASSWORD=os.environ.get('PG_PASSWORD')
 SONGKICK_KEY=os.environ.get('SONGKICK_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(os.environ.get('DJANGO_DEBUG', True))
+DEBUG = bool(os.environ.get('DJANGO_DEBUG', False))
 
 ALLOWED_HOSTS = ['festivalpickr.herokuapps.com','127.0.0.1']
 
