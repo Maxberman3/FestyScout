@@ -34,6 +34,18 @@ def index(request):
 def about(request):
     return render(request, 'festivalpickr/about.html')
 
+def festivalspage(request):
+    context={
+    'festivals': list(Festival.objects.values_list('name',flat=True))
+    }
+    return render(request,'festivalpickr/festivals.html',context)
+
+def festivallineup(request,festivalname):
+    context={
+    'lineup': list(Festival.objects.get(name=festivalname).bands.values_list('name',flat=True)),
+    'name':festivalname,
+    }
+    return render(request,'festivalpickr/lineup.html',context)
 #renders contact page and handles contact form/sends email
 def contact(request):
     if request.method == 'POST':

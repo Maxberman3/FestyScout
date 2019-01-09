@@ -1,0 +1,27 @@
+{% extends "festivalpickr/base.html" %}
+{% block content %}
+
+<section id="parallax">
+
+<!-- Banner -->
+  <section id="banner">
+    <header>
+      <h2>Festivals</h2>
+    </header>
+  </section>
+
+<!-- Main -->
+  <section id="main" class="container">
+      <div class="box">
+        <ul>
+          {%for festival in festivals %}
+          <li><a href="{%url 'festivallineup' festival %}">{{festival}}</a></li>
+          {% endfor %}
+          </ul>
+        </div>
+      <br />
+  </section>
+
+  </section>
+
+{% endblock content %}

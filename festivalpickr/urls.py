@@ -16,6 +16,8 @@ urlpatterns=[
     path("getspotify",views.getspotify,name='getspotify'),
     path("landing/",views.landing,name='landing'),
     path("refreshlanding",views.refreshlanding,name='refreshlanding'),
+    path("festivals",views.festivalspage,name='festivalspage'),
+    path("festivals/<str:festivalname>",views.festivallineup,name='festivallineup'),
 
     path('', include('django.contrib.auth.urls')),
     #COMMENTS BELOW ARE URLS WHICH HANDLE BITCOIN PAYMENT FUNCTIONALITY
